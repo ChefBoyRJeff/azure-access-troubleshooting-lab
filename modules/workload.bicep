@@ -4,7 +4,7 @@ param location string
 @description('Tags applied to the workload resources')
 param tags object
 
-resource vnet 'Microsoft.Network/virtualNetworks@2026-03-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2026-01-01' = {
   name: 'vnet-access-lab'
   location: location
   tags: tags
