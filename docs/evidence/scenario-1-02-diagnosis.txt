@@ -1,0 +1,7 @@
+Principal                 Role         Scope
+------------------------  -----------  --------------------------------------------------------------------------------------
+grp-lab-app-contributors  Contributor  /subscriptions/<guid>/resourceGroups/rg-access-lab-other
+
+
+
+

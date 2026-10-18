@@ -1,0 +1,5 @@
+ERROR: (AuthorizationFailed) The client 'labtester@contoso.onmicrosoft.com' with object id '<guid>' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/read' over scope '/subscriptions/<guid>/resourcegroups/rg-access-lab-app' or the scope is invalid. If access was recently granted, please refresh your credentials.
+Code: AuthorizationFailed
+Message: The client 'labtester@contoso.onmicrosoft.com' with object id '<guid>' does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/read' over scope '/subscriptions/<guid>/resourcegroups/rg-access-lab-app' or the scope is invalid. If access was recently granted, please refresh your credentials.
+
+

@@ -1,0 +1,4 @@
+Role                 Scope
+-------------------  ------------------------------------------------------------------------------------
+Network Contributor  /subscriptions/<guid>/resourceGroups/rg-access-lab-app
+
