@@ -60,3 +60,4 @@ Scope: /subscriptions/<guid>/resourceGroups/rg-access-lab-app
 
 Resource changes: 3 to create, 1 to modify, 2 no change, 2 to ignore.
 
+

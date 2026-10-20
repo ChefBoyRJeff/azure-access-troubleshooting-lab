@@ -1,0 +1,21 @@
+Request URL (fake signature): https://stacclabzitxqeihauio4.blob.core.windows.net/reports/report-q3.txt?sv=2023-11-03&sr=b&sp=r&st=2026-10-20T00:00:00Z&se=2026-10-21T00:00:00Z&spr=https&sig=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%3D
+HTTP status: 403
+﻿AuthenticationFailedServer failed to authenticate the request. Make sure the value of Authorization header is formed correctly including the signature.
+RequestId:<guid>
+Time:2026-10-20T22:12:11.2155610ZSignature did not match. String to sign used was r
+2026-10-20T00:00:00Z
+2026-10-21T00:00:00Z
+/blob/stacclabzitxqeihauio4/reports/report-q3.txt
+
+
+https
+2023-11-03
+b
+
+
+
+
+
+
+
+

@@ -17,6 +17,8 @@ The first diagnostic step is the error code: it tells you **which control** bloc
 | `AuthorizationFailed` | RBAC: **who** the caller is | ✅ Yes | [1](docs/scenario-1-wrong-scope-rbac.md), [4](docs/scenario-4-policy-remediation-identity.md) |
 | `ScopeLocked` | Resource lock: **protection** | ❌ No, even Owners are blocked | [2](docs/scenario-2-readonly-lock.md) |
 | `RequestDisallowedByPolicy` | Azure Policy: **what** is deployed | ❌ No, the request must comply | [3](docs/scenario-3-policy-deny.md) |
+| `AuthorizationPermissionMismatch` | Storage data-plane RBAC: valid identity, no **data** role | ✅ Yes, a Storage ... Data role | [5](docs/scenario-5-storage-data-plane.md) |
+| `AuthenticationFailed` / `NoAuthenticationInformation` | **Authentication**: credential invalid or missing | ❌ No, fix the credential | [5](docs/scenario-5-storage-data-plane.md) |
 
 ## Architecture
 
@@ -27,6 +29,7 @@ flowchart TB
     subgraph APP["rg-access-lab-app"]
       VNET["vnet-access-lab"]
       NSG["Test NSGs"]
+      STG["Storage account: reports container"]
       LOCK["CanNotDelete lock"]
       PDENY["Policy: Require costCenter tag (Deny)"]
       PMOD["Policy: Inherit costCenter tag (Modify)"]
@@ -37,6 +40,7 @@ flowchart TB
   GRP -->|Network Contributor| APP
   PMOD --- MI
   MI -->|Tag Contributor| APP
+  GRP -->|Storage Blob Data Reader| STG
 ```
 
 | Component | Purpose |
@@ -56,6 +60,7 @@ flowchart TB
 | [2](docs/scenario-2-readonly-lock.md) | "I can't change anything anymore" | ReadOnly lock used where CanNotDelete was intended | Added CanNotDelete first, then removed ReadOnly | `ScopeLocked` means RBAC already allowed the request |
 | [3](docs/scenario-3-policy-deny.md) | "My deployment fails with a policy error" | Deny policy requiring `costCenter`, enforced without notice | Resubmitted with the required tag; no governance change | Roll out Deny policies with an audit period first |
 | [4](docs/scenario-4-policy-remediation-identity.md) | "The auto-tag policy isn't fixing anything" | Policy managed identity had no role | Tag Contributor (not the declared Contributor), proven by a successful remediation | Read the failing action to choose the narrowest role |
+| [5](docs/scenario-5-storage-data-plane.md) | "I can't read the blob" | Reader (control plane) assigned; no data-plane role | Storage Blob Data Reader on the container; Reader removed (lock lifted briefly, with approval) | Owner and Reader don't grant data access; keys bypass RBAC |
 
 Each scenario document links its evidence in [`docs/evidence/`](docs/evidence/).
 
@@ -64,7 +69,7 @@ Each scenario document links its evidence in [`docs/evidence/`](docs/evidence/).
 | Path | Purpose |
 |---|---|
 | `main.bicep` | Subscription-scope deployment: tagged resource groups + workload module |
-| `modules/workload.bicep` | Baseline VNet in `rg-access-lab-app` |
+| `modules/workload.bicep` | Baseline VNet and private storage account (`reports` container) in `rg-access-lab-app` |
 | `docs/scenario-*.md` | One root-cause analysis per scenario |
 | `docs/evidence/` | Sanitized command output for every scenario |
 
@@ -100,7 +105,7 @@ Sign in through a private browser window so an existing admin session isn't reus
 
 ## Cost
 
-**$0.** Resource groups, VNets, NSGs, RBAC, locks, Azure Policy, managed identities, and test users have no charge.
+**Under $0.01/month.** The only billable resource is one Standard LRS storage account holding a few KB (Scenario 5). Resource groups, VNets, NSGs, RBAC, locks, Azure Policy, managed identities, and test users have no charge.
 
 ## Teardown
 
@@ -126,6 +131,7 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 | Manage Azure identities and governance | Implement and manage Azure Policy; configure resource locks; apply and manage tags; manage resource groups |
 | Manage Azure identities and governance | Create users and groups |
 | Deploy and manage Azure compute resources | Interpret, modify, and deploy Bicep files |
+| Implement and manage storage | Create and configure storage accounts; create and configure a container in Azure Blob Storage; manage access keys |
 
 ## Lessons Learned
 
@@ -134,10 +140,13 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 - **The error code is the fastest diagnostic.** `AuthorizationFailed`, `ScopeLocked`, and `RequestDisallowedByPolicy` point to three different controls.
 - **Least privilege can be proven.** In Scenario 4, Tag Contributor was enough, even though the policy definition declares Contributor.
 - **IaC can undo manual fixes.** Bicep tags replace existing tags; what-if showed a redeploy would have removed `costCenter` until the template was updated.
+- **Owner doesn't mean data access.** Reading a blob with Entra ID needs a Storage ... Data role. Control-plane roles manage the account, and account keys bypass RBAC entirely, which is why Reader can't list them.
+- **Locks protect role assignments too.** The CanNotDelete lock blocked removing an unneeded role assignment, even for an Owner.
+- **Check what a test actually sent.** On Windows, `az` passes arguments through cmd.exe, which split a SAS URL at `&`; `Invoke-WebRequest` sent it intact.
 
 ## Limitations and Future Improvements
 
 - Scenario misconfigurations, role assignments, locks, and policy assignments are created with the CLI, not yet defined in Bicep
-- Planned: **Key Vault** access by a managed identity, and an **authentication vs. authorization** diagnosis scenario
+- Planned: **Key Vault** access by a managed identity (authentication vs. authorization is now covered in Scenario 5)
 - Planned: a demo script and interview walkthrough
 - Teardown steps are documented but not yet executed

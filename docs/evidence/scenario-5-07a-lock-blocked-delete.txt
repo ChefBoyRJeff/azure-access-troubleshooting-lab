@@ -1,0 +1,10 @@
+Operation                                       Status     Time
+----------------------------------------------  ---------  ----------------------------
+Microsoft.Authorization/locks/write             Succeeded  2026-10-20T22:15:24.8388019Z
+Microsoft.Authorization/locks/write             Started    2026-10-20T22:15:24.7450621Z
+Microsoft.Authorization/roleAssignments/delete  Succeeded  2026-10-20T22:15:23.3254475Z
+Microsoft.Authorization/roleAssignments/delete  Started    2026-10-20T22:15:22.2317078Z
+Microsoft.Authorization/locks/delete            Succeeded  2026-10-20T22:15:20.1344449Z
+Microsoft.Authorization/locks/delete            Started    2026-10-20T22:15:20.0719489Z
+Microsoft.Authorization/roleAssignments/delete  Failed     2026-10-20T22:13:27.1384904Z
+Microsoft.Authorization/roleAssignments/delete  Started    2026-10-20T22:13:27.0447387Z

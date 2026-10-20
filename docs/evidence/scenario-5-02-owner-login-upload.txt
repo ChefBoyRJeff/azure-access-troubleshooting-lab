@@ -1,0 +1,14 @@
+ERROR: 
+You do not have the required permissions needed to perform this operation.
+Depending on your operation, you may need to be assigned one of the following roles:
+    "Storage Blob Data Owner"
+    "Storage Blob Data Contributor"
+    "Storage Blob Data Reader"
+    "Storage Queue Data Contributor"
+    "Storage Queue Data Reader"
+    "Storage Table Data Contributor"
+    "Storage Table Data Reader"
+
+If you want to use the old authentication method and allow querying for the right account key, please use the "--auth-mode" parameter and "key" value.
+                    
+

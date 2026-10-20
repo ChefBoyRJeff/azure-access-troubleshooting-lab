@@ -1,0 +1,24 @@
+=== Positive: read the blob ===
+
+Alive[################################################################]  100.0000%
+Finished[#############################################################]  100.0000%
+Synthetic lab report. No real data.
+=== Negative: write a blob (should fail) ===
+ERROR: 
+You do not have the required permissions needed to perform this operation.
+Depending on your operation, you may need to be assigned one of the following roles:
+    "Storage Blob Data Owner"
+    "Storage Blob Data Contributor"
+    "Storage Blob Data Reader"
+    "Storage Queue Data Contributor"
+    "Storage Queue Data Reader"
+    "Storage Table Data Contributor"
+    "Storage Table Data Reader"
+
+If you want to use the old authentication method and allow querying for the right account key, please use the "--auth-mode" parameter and "key" value.
+                    
+=== Negative: control plane after removing Reader (should fail) ===
+ERROR: (AuthorizationFailed) The client 'labtester@contoso.onmicrosoft.com' with object id '<guid>' does not have authorization to perform action 'Microsoft.Storage/storageAccounts/read' over scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4' or the scope is invalid. If access was recently granted, please refresh your credentials.
+Code: AuthorizationFailed
+Message: The client 'labtester@contoso.onmicrosoft.com' with object id '<guid>' does not have authorization to perform action 'Microsoft.Storage/storageAccounts/read' over scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4' or the scope is invalid. If access was recently granted, please refresh your credentials.
+

@@ -1,0 +1,10 @@
+=== Role assignments ===
+Role                      Scope
+------------------------  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Network Contributor       /subscriptions/<guid>/resourceGroups/rg-access-lab-app
+Storage Blob Data Reader  /subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4/blobServices/default/containers/reports
+=== Locks ===
+Name               Level
+-----------------  ------------
+lock-nodelete-app  CanNotDelete
+

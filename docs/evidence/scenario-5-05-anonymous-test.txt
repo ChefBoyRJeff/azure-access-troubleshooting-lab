@@ -1,0 +1,16 @@
+ERROR: Public access is not permitted on this storage account.(<?xml version="1.0" encoding="utf-8"?><Error><Code>PublicAccessNotPermitted</Code><Message>Public access is not permitted on this storage account.
+RequestId:<guid>
+Time:2026-10-20T22:11:05.1830902Z</Message></Error>)
+'sr' is not recognized as an internal or external command,
+operable program or batch file.
+'sp' is not recognized as an internal or external command,
+operable program or batch file.
+'st' is not recognized as an internal or external command,
+operable program or batch file.
+'se' is not recognized as an internal or external command,
+operable program or batch file.
+'spr' is not recognized as an internal or external command,
+operable program or batch file.
+'sig' is not recognized as an internal or external command,
+operable program or batch file.
+

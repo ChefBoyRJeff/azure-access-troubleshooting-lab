@@ -1,0 +1,5 @@
+Role                 Scope
+-------------------  ------------------------------------------------------------------------------------------------------------------------------------------------------
+Network Contributor  /subscriptions/<guid>/resourceGroups/rg-access-lab-app
+Reader               /subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4
+

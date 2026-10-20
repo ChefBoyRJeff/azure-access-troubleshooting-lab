@@ -1,0 +1,40 @@
+=== Test A: control plane (Reader) ===
+Name                   Sku
+---------------------  ------------
+stacclabzitxqeihauio4  Standard_LRS
+=== Test B: data plane via Entra ID (CLI) ===
+ERROR: 
+You do not have the required permissions needed to perform this operation.
+Depending on your operation, you may need to be assigned one of the following roles:
+    "Storage Blob Data Owner"
+    "Storage Blob Data Contributor"
+    "Storage Blob Data Reader"
+    "Storage Queue Data Contributor"
+    "Storage Queue Data Reader"
+    "Storage Table Data Contributor"
+    "Storage Table Data Reader"
+
+If you want to use the old authentication method and allow querying for the right account key, please use the "--auth-mode" parameter and "key" value.
+                    
+=== Test C: data plane via Entra ID (raw REST) ===
+ERROR: This request is not authorized to perform this operation using this permission.(<?xml version="1.0" encoding="utf-8"?><Error><Code>AuthorizationPermissionMismatch</Code><Message>This request is not authorized to perform this operation using this permission.
+RequestId:<guid>
+Time:2026-10-20T22:07:46.5606897Z</Message></Error>)
+=== Test D: account key path ===
+WARNING: 
+There are no credentials provided in your command and environment, we will query for account key for your storage account.
+It is recommended to provide --connection-string, --account-key or --sas-token in your command as credentials.
+
+You also can add `--auth-mode login` in your command to use Azure Active Directory (Azure AD) for authorization if your login account is assigned required RBAC roles.
+For more information about RBAC roles in storage, visit https://learn.microsoft.com/azure/storage/common/storage-auth-aad-rbac-cli.
+
+In addition, setting the corresponding environment variables can avoid inputting credentials in your command. Please use --help to get more information about environment variable usage.
+WARNING: 
+Skip querying account key due to failure: (AuthorizationFailed) The client 'labtester@contoso.onmicrosoft.com' with object id '<guid>' does not have authorization to perform action 'Microsoft.Storage/storageAccounts/listKeys/action' over scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4' or the scope is invalid. If access was recently granted, please refresh your credentials.
+Code: AuthorizationFailed
+Message: The client 'labtester@contoso.onmicrosoft.com' with object id '<guid>' does not have authorization to perform action 'Microsoft.Storage/storageAccounts/listKeys/action' over scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4' or the scope is invalid. If access was recently granted, please refresh your credentials.
+ERROR: Server failed to authenticate the request. Please refer to the information in the www-authenticate header.
+RequestId:<guid>
+Time:2026-10-20T22:07:48.5847341Z
+ErrorCode:NoAuthenticationInformation
+
