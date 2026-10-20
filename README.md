@@ -67,6 +67,7 @@ Each scenario document links its evidence in [`docs/evidence/`](docs/evidence/).
 | `modules/workload.bicep` | Baseline VNet in `rg-access-lab-app` |
 | `docs/scenario-*.md` | One root-cause analysis per scenario |
 | `docs/evidence/` | Sanitized command output for every scenario |
+
 ## Deploy the Baseline
 
 **Prerequisites:** Azure subscription, [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli), Bicep (`az bicep install`), and permission to create resource groups, role assignments, and policy assignments.
@@ -140,4 +141,5 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 - Planned: **Key Vault** access by a managed identity, and an **authentication vs. authorization** diagnosis scenario
 - Planned: a demo script and interview walkthrough
 - Teardown steps are documented but not yet executed
+
 
