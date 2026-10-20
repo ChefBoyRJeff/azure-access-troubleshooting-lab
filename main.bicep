@@ -33,3 +33,6 @@ module workload 'modules/workload.bicep' = {
     tags: tags
   }
 }
+
+
+output storageAccountName string = workload.outputs.storageAccountName

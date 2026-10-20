@@ -1,0 +1,61 @@
+Note: The result may contain false positive predictions (noise).
+You can help us improve the accuracy of the result by opening an issue here: https://aka.ms/WhatIfIssues
+NOTICE! - Want to get What-if without noise? Move to Deployment Stacks What-If https://aka.ms/stackswhatifGA
+
+Resource and property changes are indicated with these symbols:
+  - Delete
+  + Create
+  ~ Modify
+  = Nochange
+  * Ignore
+
+The deployment will update the following scopes:
+
+Scope: /subscriptions/<guid>
+
+  = resourceGroups/rg-access-lab-app [2024-03-01]
+  = resourceGroups/rg-access-lab-other [2024-03-01]
+
+Scope: /subscriptions/<guid>/resourceGroups/rg-access-lab-app
+
+  + Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4 [2025-06-01]
+
+      apiVersion:                          "2025-06-01"
+      id:                                  "/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4"
+      kind:                                "StorageV2"
+      location:                            "eastus"
+      name:                                "stacclabzitxqeihauio4"
+      properties.accessTier:               "Hot"
+      properties.allowBlobPublicAccess:    false
+      properties.allowSharedKeyAccess:     true
+      properties.minimumTlsVersion:        "TLS1_2"
+      properties.supportsHttpsTrafficOnly: true
+      sku.name:                            "Standard_LRS"
+      tags.costCenter:                     "CC-1001"
+      tags.environment:                    "lab"
+      tags.owner:                          "jeff"
+      tags.project:                        "access-troubleshooting-lab"
+      type:                                "Microsoft.Storage/storageAccounts"
+
+  + Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4/blobServices/default [2025-06-01]
+
+      apiVersion: "2025-06-01"
+      id:         "/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4/blobServices/default"
+      name:       "default"
+      type:       "Microsoft.Storage/storageAccounts/blobServices"
+
+  + Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4/blobServices/default/containers/reports [2025-06-01]
+
+      apiVersion:              "2025-06-01"
+      id:                      "/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4/blobServices/default/containers/reports"
+      name:                    "reports"
+      properties.publicAccess: "None"
+      type:                    "Microsoft.Storage/storageAccounts/blobServices/containers"
+
+  ~ Microsoft.Network/virtualNetworks/vnet-access-lab [2026-01-01]
+    - properties.privateEndpointVNetPolicies: "Disabled"
+
+  * Microsoft.Network/networkSecurityGroups/nsg-ticket-2
+  * Microsoft.Network/networkSecurityGroups/nsg-ticket-3
+
+Resource changes: 3 to create, 1 to modify, 2 no change, 2 to ignore.
