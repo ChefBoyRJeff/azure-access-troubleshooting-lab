@@ -72,4 +72,4 @@ The first reproduction attempt **succeeded** when it should have failed. The Act
 
 **Rule:** before trusting an access test, confirm the identity with `az account show --query user.name`.
 
-Evidence: [`scenario-1-00-wrong-identity.txt`](evidence/scenario-1-00-wrong-identity.txt), [`scenario-1-00-activity-log.txt`](evidence/scenario-1-00-activity-log.txt)
+Evidence: [`scenario-1-00-activity-log.txt`](evidence/scenario-1-00-activity-log.txt) (shows the admin account as the caller). The original success output was overwritten by the corrected re-test, so the Activity Log is the record of the wrong-identity run.

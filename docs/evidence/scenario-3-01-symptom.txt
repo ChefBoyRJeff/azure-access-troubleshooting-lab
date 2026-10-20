@@ -1,0 +1,5 @@
+ERROR: (RequestDisallowedByPolicy) Resource 'nsg-ticket-3' was disallowed by policy. Policy identifiers: '[{"policyAssignment":{"name":"Require costCenter tag","id":"/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Authorization/policyAssignments/require-costcenter-tag"},"policyDefinition":{"name":"Require a tag on resources","id":"/providers/Microsoft.Authorization/policyDefinitions/<guid>","version":"1.0.1"}}]'.
+Code: RequestDisallowedByPolicy
+Message: Resource 'nsg-ticket-3' was disallowed by policy. Policy identifiers: '[{"policyAssignment":{"name":"Require costCenter tag","id":"/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Authorization/policyAssignments/require-costcenter-tag"},"policyDefinition":{"name":"Require a tag on resources","id":"/providers/Microsoft.Authorization/policyDefinitions/<guid>","version":"1.0.1"}}]'.
+Target: nsg-ticket-3
+

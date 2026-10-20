@@ -1,0 +1,8 @@
+{
+  "name": "nsg-ticket-3",
+  "state": "Succeeded",
+  "tags": {
+    "costCenter": "CC-1001"
+  }
+}
+

@@ -1,0 +1,6 @@
+Resource                                                                                                                                             Policy
+---------------------------------------------------------------------------------------------------------------------------------------------------  ----------------------
+/subscriptions/<guid>/resourcegroups/rg-access-lab-app/providers/microsoft.network/virtualnetworks/vnet-access-lab     SecurityCenterBuiltIn
+/subscriptions/<guid>/resourcegroups/rg-access-lab-app/providers/microsoft.network/virtualnetworks/vnet-access-lab     require-costcenter-tag
+/subscriptions/<guid>/resourcegroups/rg-access-lab-app/providers/microsoft.network/networksecuritygroups/nsg-ticket-2  require-costcenter-tag
+

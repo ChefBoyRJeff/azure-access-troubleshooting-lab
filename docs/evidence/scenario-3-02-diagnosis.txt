@@ -1,0 +1,12 @@
+[
+  {
+    "displayName": "Require costCenter tag",
+    "name": "require-costcenter-tag",
+    "parameters": {
+      "tagName": {
+        "value": "costCenter"
+      }
+    }
+  }
+]
+
