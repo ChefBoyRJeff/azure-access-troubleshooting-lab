@@ -1,0 +1,30 @@
+Note: The result may contain false positive predictions (noise).
+You can help us improve the accuracy of the result by opening an issue here: https://aka.ms/WhatIfIssues
+NOTICE! - Want to get What-if without noise? Move to Deployment Stacks What-If https://aka.ms/stackswhatifGA
+
+Resource and property changes are indicated with these symbols:
+  - Delete
+  ~ Modify
+  = Nochange
+  * Ignore
+
+The deployment will update the following scopes:
+
+Scope: /subscriptions/<guid>
+
+  ~ resourceGroups/rg-access-lab-app [2024-03-01]
+    - tags.costCenter: "CC-1001"
+
+  = resourceGroups/rg-access-lab-other [2024-03-01]
+
+Scope: /subscriptions/<guid>/resourceGroups/rg-access-lab-app
+
+  ~ Microsoft.Network/virtualNetworks/vnet-access-lab [2026-01-01]
+    - properties.privateEndpointVNetPolicies: "Disabled"
+    - tags.costCenter:                        "CC-1001"
+
+  * Microsoft.Network/networkSecurityGroups/nsg-ticket-2
+  * Microsoft.Network/networkSecurityGroups/nsg-ticket-3
+
+Resource changes: 2 to modify, 1 no change, 2 to ignore.
+

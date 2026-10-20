@@ -8,6 +8,7 @@ param tags object = {
   project: 'access-troubleshooting-lab'
   environment: 'lab'
   owner: 'jeff'
+  costCenter: 'CC-1001'
 }
 
 // ─── Resource groups ────────────────────────────────────────

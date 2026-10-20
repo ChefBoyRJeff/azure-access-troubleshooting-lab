@@ -1,0 +1,8 @@
+Name                 CostCenter
+-------------------  ------------
+rg-access-lab-other  CC-1001
+rg-access-lab-app    CC-1001
+Name             CostCenter    PrivateEndpointVNetPolicies
+---------------  ------------  -----------------------------
+vnet-access-lab  CC-1001       Disabled
+

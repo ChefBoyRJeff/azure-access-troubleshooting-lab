@@ -79,3 +79,15 @@ Evidence: [`scenario-4-04-verification.txt`](evidence/scenario-4-04-verification
 - A failed remediation task can't be restarted; a new task must be created
 - The first task used `ReEvaluateCompliance` (about 10 minutes); the retry used existing compliance data (about 1 minute)
 - RBAC changes for managed identities may take several minutes to apply
+## 8. Prevention Implemented: IaC Tag Drift
+
+Bicep `tags` replace a resource's existing tags. The baseline template didn't include `costCenter`, so a redeployment would have removed it from `rg-access-lab-app` (the tag the Modify policy inherits from) and from `vnet-access-lab`.
+
+| What-if | `rg-access-lab-app` | `vnet-access-lab` |
+|---|---|---|
+| Before fix | Removes `costCenter` | Removes `costCenter` |
+| After adding `costCenter` to the `tags` parameter | NoChange | `costCenter` kept |
+
+What-if also reported `privateEndpointVNetPolicies` as removed. This was checked after deployment and the value was unchanged (`Disabled`), confirming it was what-if noise caused by a service default not declared in the template.
+
+Evidence: [`scenario-4-05-whatif-before.txt`](evidence/scenario-4-05-whatif-before.txt), [`scenario-4-06-whatif-after.txt`](evidence/scenario-4-06-whatif-after.txt), [`scenario-4-07-post-deploy.txt`](evidence/scenario-4-07-post-deploy.txt)
