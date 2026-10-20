@@ -1,0 +1,14 @@
+{
+  "state": "Succeeded",
+  "status": {
+    "failedDeployments": 0,
+    "successfulDeployments": 2,
+    "totalDeployments": 2
+  }
+}
+Name             CostCenter
+---------------  ------------
+vnet-access-lab  CC-1001
+nsg-ticket-2     CC-1001
+nsg-ticket-3     CC-1001
+

@@ -1,5 +1,21 @@
 {
-  "state": "Evaluating",
-  "summary": null
+  "state": "Failed",
+  "status": {
+    "failedDeployments": 2,
+    "successfulDeployments": 0,
+    "totalDeployments": 2
+  }
 }
-[]
+[
+  {
+    "error": "Failed to remediate resource: '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Network/networkSecurityGroups/nsg-ticket-2'. The 'PATCH' request failed with status code: 'Forbidden'. Inner Error: 'The client '<guid>' with object id '<guid>' does not have authorization to perform action 'Microsoft.Resources/tags/write' over scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Network/networkSecurityGroups/nsg-ticket-2/providers/Microsoft.Resources/tags/default' or the scope is invalid. If access was recently granted, please refresh your credentials.', Correlation Id: '<guid>'.",
+    "resource": "/subscriptions/<guid>/resourcegroups/rg-access-lab-app/providers/microsoft.network/networksecuritygroups/nsg-ticket-2",
+    "status": "Failed"
+  },
+  {
+    "error": "Failed to remediate resource: '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Network/virtualNetworks/vnet-access-lab'. The 'PATCH' request failed with status code: 'Forbidden'. Inner Error: 'The client '<guid>' with object id '<guid>' does not have authorization to perform action 'Microsoft.Resources/tags/write' over scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Network/virtualNetworks/vnet-access-lab/providers/Microsoft.Resources/tags/default' or the scope is invalid. If access was recently granted, please refresh your credentials.', Correlation Id: '<guid>'.",
+    "resource": "/subscriptions/<guid>/resourcegroups/rg-access-lab-app/providers/microsoft.network/virtualnetworks/vnet-access-lab",
+    "status": "Failed"
+  }
+]
+
