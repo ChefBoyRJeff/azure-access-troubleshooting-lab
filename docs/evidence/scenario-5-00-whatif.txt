@@ -59,3 +59,4 @@ Scope: /subscriptions/<guid>/resourceGroups/rg-access-lab-app
   * Microsoft.Network/networkSecurityGroups/nsg-ticket-3
 
 Resource changes: 3 to create, 1 to modify, 2 no change, 2 to ignore.
+

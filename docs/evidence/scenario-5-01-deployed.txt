@@ -1,0 +1,7 @@
+Name                   Sku           PublicAccess    Tls     HttpsOnly    CostCenter
+---------------------  ------------  --------------  ------  -----------  ------------
+stacclabzitxqeihauio4  Standard_LRS  False           TLS1_2  True         CC-1001
+Container    PublicAccess
+-----------  --------------
+reports      None
+
