@@ -1,0 +1,5 @@
+Succeeded
+ERROR: (ScopeLocked) The scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Network/virtualNetworks/vnet-access-lab' cannot perform delete operation because following scope(s) are locked: '/subscriptions/<guid>/resourceGroups/rg-access-lab-app'. Please remove the lock and try again.
+Code: ScopeLocked
+Message: The scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Network/virtualNetworks/vnet-access-lab' cannot perform delete operation because following scope(s) are locked: '/subscriptions/<guid>/resourceGroups/rg-access-lab-app'. Please remove the lock and try again.
+

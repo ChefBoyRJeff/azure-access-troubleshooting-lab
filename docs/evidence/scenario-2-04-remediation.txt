@@ -1,0 +1,4 @@
+Name               Level         Notes
+-----------------  ------------  --------------------------------------------
+lock-nodelete-app  CanNotDelete  Prevent accidental deletion; changes allowed
+

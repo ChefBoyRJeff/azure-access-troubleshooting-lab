@@ -1,0 +1,4 @@
+Name              Level     Notes                                Scope
+----------------  --------  -----------------------------------  ---------------------------------------------------------------------------------------------------------------------------------------------
+lock-protect-app  ReadOnly  Protect app resources from deletion  /subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Authorization/locks/lock-protect-app
+

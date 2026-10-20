@@ -1,0 +1,7 @@
+Name              Level
+----------------  --------
+lock-protect-app  ReadOnly
+ERROR: (AuthorizationFailed) The client 'labtester@contoso.onmicrosoft.com' with object id '<guid>' does not have authorization to perform action 'Microsoft.Authorization/locks/delete' over scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Authorization/locks/lock-protect-app' or the scope is invalid. If access was recently granted, please refresh your credentials.
+Code: AuthorizationFailed
+Message: The client 'labtester@contoso.onmicrosoft.com' with object id '<guid>' does not have authorization to perform action 'Microsoft.Authorization/locks/delete' over scope '/subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Authorization/locks/lock-protect-app' or the scope is invalid. If access was recently granted, please refresh your credentials.
+
