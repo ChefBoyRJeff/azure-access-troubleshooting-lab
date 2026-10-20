@@ -71,7 +71,7 @@ The ticket's error was an **authorization** failure: Azure knew who the user was
 
 ### Unexpected Finding: The Lock Blocked Removing Access
 
-Deleting the Reader assignment failed with **`ScopeLocked`**. The CanNotDelete lock from Scenario 2 applies to role assignments inside `rg-access-lab-app`, even for an Owner. With approval, the lock was removed, the assignment deleted, and the lock recreated immediately.
+Deleting the Reader assignment failed with **`ScopeLocked`**. The CanNotDelete lock from Scenario 2 applies to role assignments inside `rg-access-lab-app`, even for an Owner. With approval, the lock was removed, the assignment deleted, and the lock recreated immediately. The Activity Log shows the lock deleted at 22:15:20 UTC and recreated at 22:15:24 UTC: the resource group was unprotected for about **4 seconds**.
 
 Evidence: [`scenario-5-07-remediation.txt`](evidence/scenario-5-07-remediation.txt), [`scenario-5-07a-lock-blocked-delete.txt`](evidence/scenario-5-07a-lock-blocked-delete.txt)
 

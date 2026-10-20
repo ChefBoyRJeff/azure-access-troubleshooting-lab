@@ -6,7 +6,7 @@ Hands-on lab that reproduces, diagnoses, and fixes real Azure "access denied" pr
 
 ## Problem It Solves
 
-When a user says "I can't do X in Azure," the cause could be identity, RBAC, a resource lock, or Azure Policy, and each needs a different fix. Changing roles won't fix a lock, and adding permissions won't fix a policy denial. This lab shows how to tell them apart quickly from the error itself and resolve each one with least privilege.
+When a user says "I can't do X in Azure," the cause could be authentication, RBAC (control plane or data plane), a resource lock, or Azure Policy, and each needs a different fix. Changing roles won't fix a lock, and adding permissions won't fix a policy denial. This lab shows how to tell them apart quickly from the error itself and resolve each one with least privilege.
 
 ## Error Code Triage
 
@@ -14,7 +14,7 @@ The first diagnostic step is the error code: it tells you **which control** bloc
 
 | Error code | Blocked by | Changing RBAC helps? | Scenario |
 |---|---|---|---|
-| `AuthorizationFailed` | RBAC: **who** the caller is | ✅ Yes | [1](docs/scenario-1-wrong-scope-rbac.md), [4](docs/scenario-4-policy-remediation-identity.md) |
+| `AuthorizationFailed` | RBAC: **who** the caller is | ✅ Yes | [1](docs/scenario-1-wrong-scope-rbac.md), [4](docs/scenario-4-policy-remediation-identity.md), [5](docs/scenario-5-storage-data-plane.md) |
 | `ScopeLocked` | Resource lock: **protection** | ❌ No, even Owners are blocked | [2](docs/scenario-2-readonly-lock.md) |
 | `RequestDisallowedByPolicy` | Azure Policy: **what** is deployed | ❌ No, the request must comply | [3](docs/scenario-3-policy-deny.md) |
 | `AuthorizationPermissionMismatch` | Storage data-plane RBAC: valid identity, no **data** role | ✅ Yes, a Storage ... Data role | [5](docs/scenario-5-storage-data-plane.md) |
@@ -101,7 +101,7 @@ Sign in through a private browser window so an existing admin session isn't reus
 
 - All evidence is sanitized: subscription, tenant, and object IDs are replaced with `<guid>`, and real domains with `contoso.onmicrosoft.com`
 - No credentials, secrets, or parameter files with real IDs are committed (`*.json` is excluded by `.gitignore`)
-- Roles are assigned to groups and managed identities at **resource group** scope, using the narrowest built-in role that worked
+- Roles are assigned to groups and managed identities at the **narrowest scope that works** (resource group or a single container), using the narrowest built-in role that worked
 
 ## Cost
 
@@ -137,7 +137,7 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 
 - **Confirm the test identity first.** My first reproduction "passed" because it ran as the admin account; the Activity Log showed the real caller.
 - **RBAC changes aren't instant.** The fix in Scenario 1 needed time to apply and a fresh sign-in.
-- **The error code is the fastest diagnostic.** `AuthorizationFailed`, `ScopeLocked`, and `RequestDisallowedByPolicy` point to three different controls.
+- **The error code is the fastest diagnostic.** `AuthorizationFailed`, `ScopeLocked`, `RequestDisallowedByPolicy`, `AuthorizationPermissionMismatch`, and `AuthenticationFailed` each point to a different control, and the last one isn't a permissions problem at all.
 - **Least privilege can be proven.** In Scenario 4, Tag Contributor was enough, even though the policy definition declares Contributor.
 - **IaC can undo manual fixes.** Bicep tags replace existing tags; what-if showed a redeploy would have removed `costCenter` until the template was updated.
 - **Owner doesn't mean data access.** Reading a blob with Entra ID needs a Storage ... Data role. Control-plane roles manage the account, and account keys bypass RBAC entirely, which is why Reader can't list them.
