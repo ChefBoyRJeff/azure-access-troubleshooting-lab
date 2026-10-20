@@ -6,7 +6,7 @@ Hands-on lab that reproduces, diagnoses, and fixes real Azure "access denied" pr
 
 ## Problem It Solves
 
-When a user says "I can't do X in Azure," the cause could be authentication, RBAC (control plane or data plane), a resource lock, or Azure Policy, and each needs a different fix. Changing roles won't fix a lock, and adding permissions won't fix a policy denial. This lab shows how to tell them apart quickly from the error itself and resolve each one with least privilege.
+When a user says "I can't do X in Azure," the cause could be the network, authentication, RBAC (control plane or data plane), a resource lock, or Azure Policy, and each needs a different fix. Changing roles won't fix a lock, and adding permissions won't fix a policy denial. This lab shows how to tell them apart quickly from the error itself and resolve each one with least privilege.
 
 ## Error Code Triage
 
@@ -19,6 +19,7 @@ The first diagnostic step is the error code: it tells you **which control** bloc
 | `RequestDisallowedByPolicy` | Azure Policy: **what** is deployed | ❌ No, the request must comply | [3](docs/scenario-3-policy-deny.md) |
 | `AuthorizationPermissionMismatch` | Storage data-plane RBAC: valid identity, no **data** role | ✅ Yes, a Storage ... Data role | [5](docs/scenario-5-storage-data-plane.md) |
 | `AuthenticationFailed` / `NoAuthenticationInformation` | **Authentication**: credential invalid or missing | ❌ No, fix the credential | [5](docs/scenario-5-storage-data-plane.md) |
+| `AuthorizationFailure` | Storage **firewall**: request from a network that isn't allowed (checked before credentials) | ❌ No, fix the network rules | [6](docs/scenario-6-storage-firewall.md) |
 
 ## Architecture
 
@@ -61,6 +62,7 @@ flowchart TB
 | [3](docs/scenario-3-policy-deny.md) | "My deployment fails with a policy error" | Deny policy requiring `costCenter`, enforced without notice | Resubmitted with the required tag; no governance change | Roll out Deny policies with an audit period first |
 | [4](docs/scenario-4-policy-remediation-identity.md) | "The auto-tag policy isn't fixing anything" | Policy managed identity had no role | Tag Contributor (not the declared Contributor), proven by a successful remediation | Read the failing action to choose the narrowest role |
 | [5](docs/scenario-5-storage-data-plane.md) | "I can't read the blob" | Reader (control plane) assigned; no data-plane role | Storage Blob Data Reader on the container; Reader removed (lock lifted briefly, with approval) | Owner and Reader don't grant data access; keys bypass RBAC |
+| [6](docs/scenario-6-storage-firewall.md) | "Not authorized from home" | Storage firewall set to Deny with only the office IP allowed | Allowed the caller's single IP; RBAC unchanged; redeploy verified the firewall persists | `AuthorizationFailure` is the network, not RBAC; keys can't bypass the firewall |
 
 Each scenario document links its evidence in [`docs/evidence/`](docs/evidence/).
 
@@ -132,7 +134,7 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 | Manage Azure identities and governance | Implement and manage Azure Policy; configure resource locks; apply and manage tags; manage resource groups |
 | Manage Azure identities and governance | Create users and groups |
 | Deploy and manage Azure compute resources | Interpret, modify, and deploy Bicep files |
-| Implement and manage storage | Create and configure storage accounts; create and configure a container in Azure Blob Storage; manage access keys |
+| Implement and manage storage | Create and configure storage accounts; create and configure a container in Azure Blob Storage; manage access keys; configure Azure Storage firewalls and virtual networks |
 
 ## Lessons Learned
 
@@ -144,10 +146,12 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 - **Owner doesn't mean data access.** Reading a blob with Entra ID needs a Storage ... Data role. Control-plane roles manage the account, and account keys bypass RBAC entirely, which is why Reader can't list them.
 - **Locks protect role assignments too.** The CanNotDelete lock blocked removing an unneeded role assignment, even for an Owner.
 - **Check what a test actually sent.** On Windows, `az` passes arguments through cmd.exe, which split a SAS URL at `&`; `Invoke-WebRequest` sent it intact.
+- **The network is checked first.** A storage firewall rejected even the account key; `AuthorizationFailure` and `AuthorizationPermissionMismatch` differ by one word but need different fixes.
+- **Bicep manages only what it declares.** Undeclared firewall rules survived a real redeploy (what-if predicted it, and the deployment confirmed it), unlike the declared tags in Scenario 4.
 
 ## Limitations and Future Improvements
 
-- Scenario misconfigurations, role assignments, locks, and policy assignments are created with the CLI, not yet defined in Bicep
+- Scenario misconfigurations, role assignments, locks, policy assignments, and storage firewall rules are created with the CLI, not yet defined in Bicep
 - Planned: **Key Vault** access by a managed identity (authentication vs. authorization is now covered in Scenario 5)
 - Demo script and interview guide: [docs/interview-guide.md](docs/interview-guide.md)
 - Teardown steps are documented but not yet executed

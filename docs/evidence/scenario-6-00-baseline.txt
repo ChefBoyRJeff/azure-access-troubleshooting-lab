@@ -1,0 +1,8 @@
+{
+  "bypass": "None",
+  "defaultAction": "Allow",
+  "ipRules": [],
+  "publicNetworkAccess": null,
+  "vnetRules": []
+}
+

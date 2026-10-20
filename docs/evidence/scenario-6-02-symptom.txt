@@ -1,0 +1,10 @@
+=== Test A: CLI read, Entra ID ===
+ERROR: 
+The request may be blocked by network rules of storage account. Please check network rule set using 'az storage account show -n accountname --query networkRuleSet'.
+If you want to change the default action to apply when no rule matches, please use 'az storage account update'.
+                    
+=== Test B: raw REST read, Entra ID ===
+ERROR: This request is not authorized to perform this operation.(<?xml version="1.0" encoding="utf-8"?><Error><Code>AuthorizationFailure</Code><Message>This request is not authorized to perform this operation.
+RequestId:<guid>
+Time:2026-10-20T22:54:42.9404891Z</Message></Error>)
+

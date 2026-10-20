@@ -1,0 +1,10 @@
+=== RBAC unchanged since Scenario 5 ===
+Role                      Scope
+------------------------  ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Network Contributor       /subscriptions/<guid>/resourceGroups/rg-access-lab-app
+Storage Blob Data Reader  /subscriptions/<guid>/resourceGroups/rg-access-lab-app/providers/Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4/blobServices/default/containers/reports
+=== Network rules ===
+defaultAction: Deny
+Allowed IPs: 203.0.113.10
+Caller IP is in the allowed list: False
+

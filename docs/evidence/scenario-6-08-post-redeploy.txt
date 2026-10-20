@@ -1,0 +1,5 @@
+=== After redeploy ===
+defaultAction: Deny
+IP rule count: 2
+Office rule present: True
+Caller IP is in the allowed list: True

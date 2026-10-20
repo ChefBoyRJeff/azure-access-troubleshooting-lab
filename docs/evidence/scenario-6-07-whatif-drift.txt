@@ -1,0 +1,40 @@
+Note: The result may contain false positive predictions (noise).
+You can help us improve the accuracy of the result by opening an issue here: https://aka.ms/WhatIfIssues
+NOTICE! - Want to get What-if without noise? Move to Deployment Stacks What-If https://aka.ms/stackswhatifGA
+
+Resource and property changes are indicated with these symbols:
+  - Delete
+  ~ Modify
+  = Nochange
+  * Ignore
+
+The deployment will update the following scopes:
+
+Scope: /subscriptions/<guid>
+
+  = resourceGroups/rg-access-lab-app [2024-03-01]
+  = resourceGroups/rg-access-lab-other [2024-03-01]
+
+Scope: /subscriptions/<guid>/resourceGroups/rg-access-lab-app
+
+  ~ Microsoft.Network/virtualNetworks/vnet-access-lab [2026-01-01]
+    - properties.privateEndpointVNetPolicies: "Disabled"
+
+  ~ Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4/blobServices/default [2025-06-01]
+    - properties:
+
+        deleteRetentionPolicy.allowPermanentDelete: false
+        deleteRetentionPolicy.enabled:              false
+        staticWebsite.enabled:                      false
+
+
+  ~ Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4/blobServices/default/containers/reports [2025-06-01]
+    - properties.defaultEncryptionScope:      "$account-encryption-key"
+    - properties.denyEncryptionScopeOverride: false
+
+  = Microsoft.Storage/storageAccounts/stacclabzitxqeihauio4 [2025-06-01]
+  * Microsoft.Network/networkSecurityGroups/nsg-ticket-2
+  * Microsoft.Network/networkSecurityGroups/nsg-ticket-3
+
+Resource changes: 3 to modify, 3 no change, 2 to ignore.
+
