@@ -72,6 +72,7 @@ Each scenario document links its evidence in [`docs/evidence/`](docs/evidence/).
 | `modules/workload.bicep` | Baseline VNet and private storage account (`reports` container) in `rg-access-lab-app` |
 | `docs/scenario-*.md` | One root-cause analysis per scenario |
 | `docs/evidence/` | Sanitized command output for every scenario |
+| `docs/interview-guide.md` | Live demo script, walkthrough, and interview questions |
 
 ## Deploy the Baseline
 
@@ -148,5 +149,5 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 
 - Scenario misconfigurations, role assignments, locks, and policy assignments are created with the CLI, not yet defined in Bicep
 - Planned: **Key Vault** access by a managed identity (authentication vs. authorization is now covered in Scenario 5)
-- Planned: a demo script and interview walkthrough
+- Demo script and interview guide: [docs/interview-guide.md](docs/interview-guide.md)
 - Teardown steps are documented but not yet executed
