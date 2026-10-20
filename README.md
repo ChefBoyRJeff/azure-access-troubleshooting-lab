@@ -141,5 +141,3 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 - Planned: **Key Vault** access by a managed identity, and an **authentication vs. authorization** diagnosis scenario
 - Planned: a demo script and interview walkthrough
 - Teardown steps are documented but not yet executed
-
-
