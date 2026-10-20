@@ -156,3 +156,27 @@ Bicep tags replace existing tags, so redeploying the original template would hav
 - Say "in my lab" or "in this project," never "in production" or "at work"
 - The misconfigurations were deliberate, so this demonstrates diagnosis and remediation technique, not handling a live outage
 - Some theories are labeled as hypotheses in the RCAs; present them that way
+
+## 11. Practice Questions With Model Answers
+
+Each answer is about 45–60 seconds spoken. They draw on what was actually done in this lab; say "in my lab," not "in production."
+
+### "A user says they can't access a storage account. Walk me through your first three steps."
+
+"First, I confirm who's affected and reproduce it as that user, not as myself. In my lab, a test once passed only because it ran as my admin account, and the Activity Log showed the real caller. Second, I read the exact error code. `AuthenticationFailed` means a bad credential. `ScopeLocked` or `RequestDisallowedByPolicy` mean RBAC isn't the problem. `AuthorizationPermissionMismatch` on storage means they're signed in but missing a data role. Third, I list their role assignments including group membership, check each scope against where the data lives, and for blob access look specifically for a Storage Blob Data role, because Owner, Contributor, and Reader don't cover data. If I grant something, I have them sign in again before closing the ticket."
+
+### "The error is `AuthorizationPermissionMismatch`, but the user says their manager gave them Contributor on the storage account yesterday."
+
+"Contributor is a management-plane role: it manages the account but doesn't grant blob data access through Entra ID. It does include listing the account keys, so a key-based request would actually work, but I wouldn't recommend that. A key bypasses RBAC, can't be traced to a person, and gives full access to every container. I'd confirm the caller's identity and how they're authenticating, ask whether they need to read or also write, and assign Storage Blob Data Reader or Contributor on the specific container. Then I'd have them retest after a fresh sign-in, and flag the account-level Contributor for removal if it was only granted for this."
+
+### "You need to remove a role assignment, but the delete fails with `ScopeLocked`. You're an Owner."
+
+"`ScopeLocked` means a resource lock blocked it, and locks override RBAC, so being Owner doesn't help. A role assignment is itself a resource stored under that scope, so a CanNotDelete lock on the resource group blocks deleting it. I'd check locks at the target and every parent scope, confirm the lock type, and get approval for the change. Then I'd remove the lock, delete the assignment, and recreate the lock in one block, and verify both the assignments and the lock afterward. In my lab, the Activity Log showed the resource group was unprotected for about 4 seconds. Only roles with lock permissions, like Owner or User Access Administrator, can do this, so a Contributor would need to escalate."
+
+### "A Modify policy's remediation failed with `Forbidden` on `tags/write`. The definition says the identity needs Contributor."
+
+"The error names the exact failing action, `tags/write`, and the identity's object ID. I'd confirm that ID matches the policy assignment's managed identity, then check its roles. In my lab it had none, because the CLI doesn't grant one unless you pass `--role`. The definition declares Contributor, but the only action needed was `tags/write`, so I granted the built-in Tag Contributor at resource group scope. I created a new remediation task, since a failed one can't be restarted, and both resources were tagged. A custom role wasn't needed because a built-in role already covered it."
+
+### "Someone fixes tags manually in the portal, and a week later a Bicep redeploy removes them again."
+
+"That's configuration drift: the fix was made outside the source of truth. In Bicep, the `tags` property replaces a resource's tags rather than merging them, so any tag not in the template is removed on redeploy. I'd put the fix into the template, standardize tags through a shared parameter or module, and deploy only through a pipeline that runs what-if on every pull request. In my lab, what-if showed the `costCenter` tag being removed before anything was deployed, so I fixed the template first. Azure Policy adds a safety net: Deny to require tags on new resources, and Modify with remediation to fix existing ones."
