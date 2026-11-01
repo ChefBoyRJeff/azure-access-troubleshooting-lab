@@ -7,3 +7,8 @@
 2026-11-01T22:22:23Z  group delete exit=0
 2026-11-01T22:22:25Z  rg-access-lab-app exists: false
 Not deleted (free, part of P4's identity story): Entra users, groups, service principal.
+=== rg-access-lab-other (approved 2026-11-01) ===
+2026-11-01T22:35:27Z  rg-access-lab-other resources: 0
+2026-11-01T22:35:44Z  group delete exit=0
+2026-11-01T22:35:46Z  rg-access-lab-other exists: false
+Kept (free, needed to redeploy the live demo): Entra group grp-lab-app-contributors, test users, custom policy definitions.
