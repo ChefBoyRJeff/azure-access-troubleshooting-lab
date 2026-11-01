@@ -1,0 +1,9 @@
+=== P4 teardown of rg-access-lab-app (approved 2026-11-01) ===
+2026-11-01T22:20:52Z  removed lock lock-nodelete-app exit=0
+2026-11-01T22:20:53Z  locks remaining: 0
+2026-11-01T22:20:55Z  RG-scoped role assignments found: 2
+2026-11-01T22:21:03Z  removed role assignment ...e529ac63 exit=0
+2026-11-01T22:21:05Z  removed role assignment ...f8ca437f exit=0
+2026-11-01T22:22:23Z  group delete exit=0
+2026-11-01T22:22:25Z  rg-access-lab-app exists: false
+Not deleted (free, part of P4's identity story): Entra users, groups, service principal.
