@@ -4,6 +4,8 @@ Hands-on lab that reproduces, diagnoses, and fixes real Azure "access denied" pr
 
 > Environment: personal Azure lab subscription. This is hands-on lab work, not production experience.
 
+> **Status (2026-11-01):** All six scenarios are complete and documented. The Azure resources were **torn down** on 2026-11-01 ([evidence](docs/evidence/teardown-2026-11-01.txt)). The Entra test user, group, and custom policy definitions were kept, so the baseline can be redeployed with `main.bicep` for the [live demo](docs/interview-guide.md).
+
 ## Problem It Solves
 
 When a user says "I can't do X in Azure," the cause could be the network, authentication, RBAC (control plane or data plane), a resource lock, or Azure Policy, and each needs a different fix. Changing roles won't fix a lock, and adding permissions won't fix a policy denial. This lab shows how to tell them apart quickly from the error itself and resolve each one with least privilege.
@@ -108,11 +110,13 @@ Sign in through a private browser window so an existing admin session isn't reus
 
 ## Cost
 
-**Under $0.01/month.** The only billable resource is one Standard LRS storage account holding a few KB (Scenario 5). Resource groups, VNets, NSGs, RBAC, locks, Azure Policy, managed identities, and test users have no charge.
+**$0 since the 2026-11-01 teardown.** While deployed, it cost under $0.01/month: the only billable resource was one Standard LRS storage account holding a few KB (Scenario 5). Resource groups, VNets, NSGs, RBAC, locks, Azure Policy, managed identities, and test users have no charge.
 
 ## Teardown
 
-> **Not yet executed.** These steps are documented for when the lab is finished. The lock must be removed first, or the resource group deletion fails with `ScopeLocked`.
+> **Executed 2026-11-01** ([evidence](docs/evidence/teardown-2026-11-01.txt)): removed `lock-nodelete-app`, removed the two role assignments scoped to `rg-access-lab-app` (Network Contributor for `grp-lab-app-contributors`, Tag Contributor for the policy's managed identity), then deleted `rg-access-lab-app` and the empty `rg-access-lab-other`. **Kept on purpose:** the Entra group and test user (free, needed to redeploy the demo). The last three commands below weren't run.
+>
+> The lock must be removed first, or the resource group deletion fails with `ScopeLocked`.
 
 ```powershell
 $rgId = az group show --name rg-access-lab-app --query id -o tsv
