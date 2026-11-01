@@ -17,3 +17,4 @@ Kept (free, needed to redeploy the live demo): Entra group grp-lab-app-contribut
 2026-11-01T22:40:56Z  group delete exit=3
 2026-11-01T22:40:58Z  rg-access-lab-other exists: false
 Kept (free, needed to redeploy the live demo): Entra group grp-lab-app-contributors, test users, custom policy definitions.
+NOTE: this second section is a re-run. rg-access-lab-other had already been deleted by the first run (commit 5d55e82); 'resources: 0' and 'exit=3' here reflect ResourceGroupNotFound, not a delete. Guard should check 'az group exists' before counting.
