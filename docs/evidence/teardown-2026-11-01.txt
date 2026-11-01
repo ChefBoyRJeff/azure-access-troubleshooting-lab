@@ -12,3 +12,8 @@ Not deleted (free, part of P4's identity story): Entra users, groups, service pr
 2026-11-01T22:35:44Z  group delete exit=0
 2026-11-01T22:35:46Z  rg-access-lab-other exists: false
 Kept (free, needed to redeploy the live demo): Entra group grp-lab-app-contributors, test users, custom policy definitions.
+=== rg-access-lab-other (approved 2026-11-01) ===
+2026-11-01T22:40:54Z  rg-access-lab-other resources: 0
+2026-11-01T22:40:56Z  group delete exit=3
+2026-11-01T22:40:58Z  rg-access-lab-other exists: false
+Kept (free, needed to redeploy the live demo): Entra group grp-lab-app-contributors, test users, custom policy definitions.
