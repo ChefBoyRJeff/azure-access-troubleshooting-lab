@@ -1,0 +1,48 @@
+=== Scenario 8 M4: B2B guest, 2026-11-04 14:19 ===
+--- tenant guest settings (authorizationPolicy) ---
+  who can invite guests: everyone
+  guest directory access: limited (default)
+--- guest after invite, before redemption ---
+  Guest Partner (S8)  userType=Guest  externalUserState=PendingAcceptance  creationType=Invitation  UPN has #EXT#=True
+--- guest after redemption ---
+    userType=  externalUserState=  creationType=  UPN has #EXT#=False
+  NOTE: lookup by displayName 'Guest Partner (S8)' returned nothing after redemption; listing all guests to diagnose.
+--- all guest users in the tenant ---
+  graph call exit=0
+  guest count: 2
+  name='<pre-existing guest, real name>'  state=Accepted  stateChanged=09:26:52  created=01-02 09:25  creationType=Invitation
+  name='<guest real name>'  state=Accepted  stateChanged=14:22:29  created=11-04 14:20  creationType=Invitation
+  ROOT CAUSE: redemption overwrote displayName with the name from the guest's own account; the lookup by the invited name failed. Pre-existing guest (created 01-02, before these labs) left untouched.
+  REMEDIATION: renamed today's guest back to 'Guest Partner (S8)' exit=0
+  verify: name='Guest Partner (S8)' userType=Guest externalUserState=Accepted
+--- least-privilege access: Reader on one empty RG ---
+  create rg-s8-guest-access exit=0
+  Reader -> Guest Partner (S8) on rg-s8-guest-access exit=0
+  guest role assignments (all scopes):
+    Reader	/subscriptions/<sub>/resourceGroups/rg-s8-guest-access
+--- POSITIVE TEST: guest signed in to portal.azure.com with own account; Resource groups listed rg-s8-guest-access (Reader works) ---
+  'I accepted but can't see anything' ticket NOT reproduced: guest account has no Azure directory of its own, so the portal opened in the resource tenant.
+--- NEGATIVE TEST: guest attempted to add a tag to rg-s8-guest-access (expect AuthorizationFailed) ---
+  (no failed guest operation in the activity log after 10 min - tell Claude)
+  error: 
+--- guest effective access (all scopes) ---
+  Reader	/subscriptions/<sub>/resourceGroups/rg-s8-guest-access
+--- POSITIVE TEST: guest signed in to portal.azure.com with own account; Resource groups listed rg-s8-guest-access (Reader works) ---
+  'I accepted but can't see anything' ticket NOT reproduced: guest account has no Azure directory of its own, so the portal opened in the resource tenant.
+--- NEGATIVE TEST: guest attempted to add a tag to rg-s8-guest-access (expect AuthorizationFailed) ---
+  (no failed guest operation in the activity log after 10 min - tell Claude)
+  error: 
+--- guest effective access (all scopes) ---
+  FINDING: portal tag attempt produced no activity-log entry. Hypothesis: the portal checks permissions client-side and blocks the write before it reaches ARM. Re-testing the write directly via CLI as the guest.
+--- CLI NEGATIVE TEST as guest (14:44) ---
+  signed-in identity is the guest: True
+  read RG (expect success): rg-s8-guest-access
+  write tag (expect AuthorizationFailed): exit=1
+  error: ERROR: (AuthorizationFailed) The client '<email>' with object id '<guid>' does not have authorization to perform action 'Microsoft.Resources/tags/write' over scope '/subscriptions/<sub>/resourceGroups/rg-s8-guest-access/providers/Microsoft.Resources/tags/default' or the scope is invalid. If access was recently granted, please refresh your credentials.
+  back to own CLI profile: True
+--- activity log after CLI attempt (any failed op on the RG, waits up to 10 min) ---
+  (still no failed operation logged)
+  RESULT: least privilege confirmed by the ARM response itself (read OK, tags/write AuthorizationFailed).
+--- broad activity-log check: subscription-wide, any status, guest as caller, last 2h ---
+  events with the guest as caller: 0
+  FINDING (unconfirmed): authorization-denied writes by the guest did not appear in the subscription activity log within ~20 min. Detecting denied attempts needs another source (e.g. Entra sign-in logs or Defender), not activity-log alerts.

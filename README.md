@@ -4,7 +4,7 @@ Hands-on lab that reproduces, diagnoses, and fixes real Azure "access denied" pr
 
 > Environment: personal Azure lab subscription. This is hands-on lab work, not production experience.
 
-> **Status (2026-11-04):** All seven scenarios are complete and documented. Scenarios 1-6 were **torn down** on 2026-11-01 ([evidence](docs/evidence/teardown-2026-11-01.txt)); Scenario 7 (management groups and a policy initiative) was built and **torn down** on 2026-11-04 ([evidence](docs/evidence/scenario-7-09-teardown.txt)). The Entra test user and group were kept, so the baseline can be redeployed with `main.bicep` for the [live demo](docs/interview-guide.md). *Correction:* an earlier version of this note said custom policy definitions were kept; the 2026-11-04 preflight found none in the subscription.
+> **Status (2026-11-04):** All eight scenarios are complete and documented. Scenarios 1-6 were **torn down** on 2026-11-01 ([evidence](docs/evidence/teardown-2026-11-01.txt)); Scenario 7 (management groups and a policy initiative) and Scenario 8 (Entra identity lifecycle on a P2 trial) were built and **torn down** on 2026-11-04 ([evidence 7](docs/evidence/scenario-7-09-teardown.txt), [evidence 8](docs/evidence/scenario-8-09-teardown.txt)). The Entra test user and group were kept, so the baseline can be redeployed with `main.bicep` for the [live demo](docs/interview-guide.md). *Correction:* an earlier version of this note said custom policy definitions were kept; the 2026-11-04 preflight found none in the subscription.
 
 ## Problem It Solves
 
@@ -22,6 +22,8 @@ The first diagnostic step is the error code: it tells you **which control** bloc
 | `AuthorizationPermissionMismatch` | Storage data-plane RBAC: valid identity, no **data** role | ✅ Yes, a Storage ... Data role | [5](docs/scenario-5-storage-data-plane.md) |
 | `AuthenticationFailed` / `NoAuthenticationInformation` | **Authentication**: credential invalid or missing | ❌ No, fix the credential | [5](docs/scenario-5-storage-data-plane.md) |
 | `AuthorizationFailure` | Storage **firewall**: request from a network that isn't allowed (checked before credentials) | ❌ No, fix the network rules | [6](docs/scenario-6-storage-firewall.md) |
+| `Insufficient privileges to complete the operation` (Graph) | **Entra directory role** scope: the admin's role doesn't cover that user, for example because it's scoped to an administrative unit | ❌ Not Azure RBAC; check the directory role and its scope | [8](docs/scenario-8-entra-identity.md) |
+| AADSTS `53003` | **Conditional Access**: sign-in succeeded, then a policy blocked it (here, in a different tenant than intended) | ❌ No, check which tenant and which policy | [8](docs/scenario-8-entra-identity.md) |
 
 ## Architecture
 
@@ -66,6 +68,7 @@ flowchart TB
 | [5](docs/scenario-5-storage-data-plane.md) | "I can't read the blob" | Reader (control plane) assigned; no data-plane role | Storage Blob Data Reader on the container; Reader removed (lock lifted briefly, with approval) | Owner and Reader don't grant data access; keys bypass RBAC |
 | [6](docs/scenario-6-storage-firewall.md) | "Not authorized from home" | Storage firewall set to Deny with only the office IP allowed | Allowed the caller's single IP; RBAC unchanged; redeploy verified the firewall persists | `AuthorizationFailure` is the network, not RBAC; keys can't bypass the firewall |
 | [7](docs/scenario-7-management-groups-initiative.md) | "I can't create a resource group, and there's no policy on our subscription" | Initiative (locations + `costCenter` tagging) assigned at a **management group** two levels up, inherited by the subscription | Compliant requests; tagged our own RG; **exemptions** (Waiver, expiry) for Azure-managed RGs; remediation task with a Tag Contributor identity; Bicep at MG scope | Read the error's assignment scope; subscription views don't show MG-inherited policy; audit (DoNotEnforce) before Deny |
+| [8](docs/scenario-8-entra-identity.md) | "Our new Finance hire can't get into Finance apps" (plus SSPR, licensing, a contractor guest and a scoped help desk) | New hire's `department` was `FIN`; the dynamic rule needs `Finance` | Fixed the data, not the rule; SSPR scoped to the dynamic group; group-based licensing; guest with Reader on one RG; Helpdesk Administrator scoped to an administrative unit | Validate Rules against a known-good user; "SSPR works unlicensed" is a compliance gap; one attribute change removed group, license and SSPR in 43 s |
 
 Each scenario document links its evidence in [`docs/evidence/`](docs/evidence/).
 
@@ -112,7 +115,7 @@ Sign in through a private browser window so an existing admin session isn't reus
 
 ## Cost
 
-**$0 since the 2026-11-01 teardown.** While deployed, it cost under $0.01/month: the only billable resource was one Standard LRS storage account holding a few KB (Scenario 5). Resource groups, VNets, NSGs, RBAC, locks, Azure Policy, managed identities, and test users have no charge.
+**$0 since the 2026-11-01 teardown.** Scenario 8 used a free **Microsoft Entra ID P2 trial** with recurring billing turned off, canceled at teardown (final state `Suspended`); its only Azure resource was an empty resource group. While deployed, it cost under $0.01/month: the only billable resource was one Standard LRS storage account holding a few KB (Scenario 5). Resource groups, VNets, NSGs, RBAC, locks, Azure Policy, managed identities, and test users have no charge.
 
 ## Teardown
 
@@ -140,6 +143,7 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 | Manage Azure identities and governance | Implement and manage Azure Policy; configure resource locks; apply and manage tags; manage resource groups |
 | Manage Azure identities and governance | Manage management groups; assign RBAC and policy at management-group scope; policy initiatives, exemptions and remediation tasks |
 | Manage Azure identities and governance | Create users and groups |
+| Manage Azure identities and governance | Manage user and group properties; manage licenses in Microsoft Entra ID (group-based); manage external users; configure self-service password reset; administrative units and dynamic membership |
 | Deploy and manage Azure compute resources | Interpret, modify, and deploy Bicep files |
 | Implement and manage storage | Create and configure storage accounts; create and configure a container in Azure Blob Storage; manage access keys; configure Azure Storage firewalls and virtual networks |
 
@@ -158,10 +162,16 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 - **Audit first, then enforce.** `DoNotEnforce` reported exactly who a Deny would affect before anyone's deployment failed.
 - **Reporting and enforcement run on different clocks.** The first full compliance evaluation took about 45 minutes, and exemptions showed as Exempt only after a re-scan, while enforcement honored them immediately.
 - **Bicep manages only what it declares.** Undeclared firewall rules survived a real redeploy (what-if predicted it, and the deployment confirmed it), unlike the declared tags in Scenario 4.
+- **Dynamic rules are only as good as the data.** In Scenario 8 a new hire was missing because `department` said `FIN`; Validate Rules against a known-good user proved it was the data, not the rule.
+- **"It works" isn't "it's licensed."** SSPR worked for an unlicensed user; Microsoft documents that some tenant features can't block unlicensed users, so the license gap had to be closed with group-based licensing.
+- **The audit log proves automation.** A department change removed group membership after 21 s and the license after 43 s, each logged as done by a Microsoft service, not a person.
+- **Licenses follow the person who uses the feature.** The portal refused to scope a role to an administrative unit until the delegated admin had their own P2 license.
+- **Denied attempts may not reach the Activity Log.** A guest's `AuthorizationFailed` writes weren't logged there within about 20 minutes (unconfirmed), so Activity Log alerts can't be relied on to catch them.
 
 ## Limitations and Future Improvements
 
 - Scenario misconfigurations, role assignments, locks, policy assignments, and storage firewall rules are created with the CLI, not yet defined in Bicep
 - Planned: **Key Vault** access by a managed identity (authentication vs. authorization is now covered in Scenario 5)
+- Scenario 8 was built in the portal and with Microsoft Graph calls, not in code; Entra objects (users, groups, administrative units, SSPR settings) aren't Bicep resources
+- Scenario 8 needed a P2 trial; reproducing it needs a P1/P2 license or another trial
 - Demo script and interview guide: [docs/interview-guide.md](docs/interview-guide.md)
-- Teardown steps are documented but not yet executed

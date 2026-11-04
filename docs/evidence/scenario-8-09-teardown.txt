@@ -1,0 +1,37 @@
+=== Scenario 8 teardown, 2026-11-04 15:03 ===
+  SSPR set back to None (portal) - original value from scenario-8-00
+--- 1. guest access: resource group (its role assignment goes with it) ---
+  delete rg-s8-guest-access exit=0
+--- 2. today's guest only (pre-existing guest untouched) ---
+  delete Guest Partner (S8) exit=0
+--- 3. administrative unit (scoped Helpdesk role goes with it) ---
+  delete au-finance exit=0
+--- 4. dynamic group (group license goes with it) ---
+  delete grp-dyn-finance exit=1
+--- 5. Scenario 8 test users ---
+  delete s8-alex exit=0
+  delete s8-blair exit=0
+  delete s8-casey exit=0
+  delete s8-drew exit=0
+--- 6. Lab Tester: remove direct P2 (user kept for P4 demos) ---
+  remove P2 from Lab Tester exit=0
+--- 7. local cleanup ---
+  removed guest CLI profile folder
+--- 8. verify ---
+  S8 users left: 0
+  grp-dyn-finance exists: True
+  rg-s8-guest-access exists: false
+  tenant AAD_PREMIUM_P2: assigned=1 (expect 1 = Lab Admin)
+  FINDING: group delete refused - 'A group with active licenses assigned cannot be deleted.' Group licenses must be removed first (safeguard against mass license loss). Teardown plan corrected.
+--- 4b. remove P2 from grp-dyn-finance, then delete the group ---
+  remove P2 from grp-dyn-finance exit=0
+  delete grp-dyn-finance exit=0
+  grp-dyn-finance exists: False
+--- 9. P2 trial canceled in M365 admin center as labadmin; status after cancel: Cancelled ---
+  delete labadmin exit=0
+  labadmin exists: False
+--- 10. final tenant license state ---
+  AAD_PREMIUM_P2: status=Suspended assigned=0
+--- 11. Azure: nothing billable left from Scenario 8 ---
+  rg-s8-guest-access exists: false
+  SSPR: None (portal, set in teardown step 0)

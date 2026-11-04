@@ -1,0 +1,16 @@
+=== Scenario 8 M5: administrative unit + scoped Helpdesk Administrator, 2026-11-04 15:00 ===
+--- AU config ---
+  membershipType=Dynamic  rule=(user.department -eq "Finance")  processing=On
+--- AU members (waits up to 10 min for dynamic processing) ---
+  members(2): Alex Finance (S8), Drew New Hire (S8)
+--- scoped role assignments on the AU ---
+  role=Helpdesk Administrator  member=Lab Tester  scope=au-finance only
+--- TESTS as Lab Tester (15:01) ---
+  signed-in identity is Lab Tester: True
+  reset password for Alex (Finance, IN au-finance): exit=0  expect=success  
+  reset password for Casey (Sales, OUTSIDE au-finance): exit=1  expect=Authorization_RequestDenied  ERROR: Insufficient privileges to complete the operation.
+  back to own CLI profile: True
+--- BLOCKER (recorded after the fact): portal showed 'To assign roles at resource scope, your organization needs Microsoft Entra ID Premium P1 or P2' although the tenant had P2 ---
+  cause/fix: AU administrators need their own P1/P2; assigned P2 directly (usageLocation=US first), signed out/in, then the scoped assignment saved.
+  Lab Tester               usageLocation=US  P2 license=direct
+  Lab Admin (Scenario 8)   usageLocation=US  P2 license=direct

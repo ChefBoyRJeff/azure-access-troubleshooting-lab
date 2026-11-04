@@ -1,0 +1,25 @@
+=== Scenario 8 M3: group-based licensing, 2026-11-04 14:03 ===
+--- P2 assigned to grp-dyn-finance in portal at 14:03 ---
+14:04:04  + 0.0 min  Finance members with active group license: 3/3
+--- per-user license state ---
+  Alex Finance (S8)    inherited from grp-dyn-finance   state=Active error=None
+  Blair Finance (S8)   inherited from grp-dyn-finance   state=Active error=None
+  Casey Sales (S8)     none                             state= error=
+  Drew New Hire (S8)   inherited from grp-dyn-finance   state=Active error=None
+--- tenant license count ---
+  AAD_PREMIUM_P2       units=100 assigned=3
+--- MOVER TEST: Blair department Finance -> Sales (expect: removed from group, license and SSPR scope automatically) ---
+14:11:12  + 0.0 min  Blair member=false  group licenses=0
+--- audit log: the change and the automatic removals ---
+  13:42:07  Add member to group                      by=Microsoft Approval Management
+  14:03:31  Change user license                      by=Microsoft Azure AD Group-Based Licensing
+--- tenant license count after mover ---
+  AAD_PREMIUM_P2       units=100 assigned=2
+--- audit log re-check (after lag): Blair removal events ---
+  13:39:08  Update PasswordProfile                   by=admin (person)
+  13:39:08  Add user                                 by=admin (person)
+  13:42:07  Add member to group                      by=Microsoft Approval Management
+  14:03:31  Change user license                      by=Microsoft Azure AD Group-Based Licensing
+  14:10:18  Update user                              by=admin (person)
+  14:10:39  Remove member from group                 by=Microsoft Approval Management
+  14:11:01  Change user license                      by=Microsoft Azure AD Group-Based Licensing

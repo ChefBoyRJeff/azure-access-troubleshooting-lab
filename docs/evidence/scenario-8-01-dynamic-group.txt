@@ -1,0 +1,25 @@
+=== Scenario 8 M1: dynamic group, 2026-11-04 13:39 ===
+--- create users ---
+  Alex Finance (S8)    dept=Finance  exit=0
+  Blair Finance (S8)   dept=Finance  exit=0
+  Casey Sales (S8)     dept=Sales    exit=0
+  Drew New Hire (S8)   dept=FIN      exit=0
+--- group created in portal at 13:41; rule: (user.department -eq "Finance") ---
+  groupTypes=DynamicMembership  rule=(user.department -eq "Finance")  processing=On
+13:42:04  + 0.0 min  members(0): 
+13:42:35  + 0.6 min  members(2): Alex Finance (S8), Blair Finance (S8)
+--- INCIDENT: new hire Drew not in grp-dyn-finance (13:45) ---
+  H1 processing delay: weak - Alex/Blair added within 0.6 min of group creation
+--- diagnosis: attribute values (Graph) ---
+  Alex Finance (S8)    department='Finance' enabled=True type=Member
+  Blair Finance (S8)   department='Finance' enabled=True type=Member
+  Casey Sales (S8)     department='Sales' enabled=True type=Member
+  Drew New Hire (S8)   department='FIN' enabled=True type=Member
+--- diagnosis: portal Validate Rules ---
+  Drew: Does not meet rule; department = FIN
+  Alex (control): Alex department = Finance
+--- ROOT CAUSE: Drew department='FIN'; rule requires exact 'Finance'. Rule correct (Alex control meets it). Data defect, not a rule defect. ---
+--- REMEDIATION: portal edit Drew department FIN -> Finance at 13:48 (fix the data, not the rule) ---
+  Drew department now: 'Finance'
+13:49:24  + 0.0 min  members(3): Alex Finance (S8), Blair Finance (S8), Drew New Hire (S8)
+--- NEGATIVE CHECK: Casey (Sales) must not be a member: PASS ---

@@ -206,3 +206,32 @@ Assign it at the management group with `DoNotEnforce`, read compliance to see wh
 
 ### Honest boundaries for this scenario
 The management group hierarchy and the subscription move were done in the portal, not in code, because a tenant-scope deployment needs deploy rights at the root. The cause of a second role assignment on the policy identity is a hypothesis (a portal edit granting the definition's Contributor), not confirmed.
+
+## 13. Scenario 8: Entra Identity Lifecycle
+
+**30-second version:** "On a free Entra ID P2 trial, I built a joiner-mover-leaver chain driven by one attribute. A dynamic group based on `department` scopes self-service password reset and assigns licenses, and a dynamic administrative unit limits a Helpdesk Administrator to Finance users. I also invited a B2B guest with Reader on a single resource group. A new hire was missing from the group because their department said `FIN`; Validate Rules against a known-good user proved it was the data, so I fixed the data rather than the rule."
+
+**Numbers to quote (from the evidence):** first members joined the dynamic group 0.6 min after it was created; a department change removed the group membership after **21 s** and the license after **43 s**, logged as Microsoft services; 3 of 3 Finance members licensed through the group at the first check; Lab Tester reset a password inside the administrative unit and was denied outside it.
+
+### Practice questions
+
+**"A new hire isn't getting access that comes from a dynamic group. How do you troubleshoot?"**
+I'd rule out processing delay first. In my lab other users had joined within a minute, so that was unlikely. Then I'd compare the user's attribute values with the rule, and run the portal's Validate Rules on the user next to a known-good user. It showed `department = FIN` against a rule needing `Finance`. I fixed the source data instead of widening the rule, and recommended a picklist at the source so it can't recur.
+
+**"SSPR worked for a user without a license. Is that a problem?"**
+Yes, it's a compliance problem rather than an outage. Microsoft documents that some tenant features can't block unlicensed users, but a license is still required for anyone meant to benefit. I closed it with group-based licensing on the same dynamic group, so the license and the SSPR scope follow the same attribute.
+
+**"How do you prove the leaver process works?"**
+Change the attribute and read the audit log. In my lab, moving a user from Finance to Sales produced *Remove member from group* after 21 seconds and *Change user license* after 43 seconds, both initiated by Microsoft services, with no manual step. A password reset attempt by an out-of-scope user was refused with the reason *"not a member of the password reset users group."*
+
+**"How would you let a Finance help desk reset only Finance passwords?"**
+An administrative unit containing the Finance users (dynamic, on the same attribute), with Helpdesk Administrator assigned at the AU's scope rather than tenant-wide. In my lab the delegated admin reset a Finance user's password and got *Insufficient privileges* for a Sales user. The portal only allowed the scoped assignment once the delegated admin had their own P1/P2 license.
+
+**"A contractor needs read access to one project in Azure. What do you set up?"**
+A B2B guest invitation, so they sign in with their own account and I never manage a password, plus Reader on that one resource group. I verified it from the guest's side: read worked, and a tag write failed with `AuthorizationFailed`. One thing I learned: redemption can overwrite the guest's display name, so look guests up by object ID, not by name.
+
+**"Authentication or authorization: 'Your sign-in was successful but you don't have permission', error 53003?"**
+Authentication succeeded; Conditional Access then blocked it, so it's a policy decision, not a credential problem. In my case the portal had picked the wrong tenant, where I'm a guest and the device wasn't registered. A tenant-specific URL fixed it.
+
+### Honest boundaries for this scenario
+This was built on a trial tenant with test users, not an HR-provisioned directory, so "HR data" was edited by hand. The *"I accepted but can't see anything"* guest ticket wasn't reproduced. Whether denied writes ever reach the Activity Log is an unconfirmed finding: none appeared within about 20 minutes. The portal's permission banner for administrative units was resolved by licensing the admins, but I didn't separately test which account's license the portal was checking.

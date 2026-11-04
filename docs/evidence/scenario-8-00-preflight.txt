@@ -1,0 +1,18 @@
+--- 1. why Try/Buy is disabled: how my own account appears in the tenant ---
+  UPN: <owner>_gmail.com#EXT#@<tenant>.onmicrosoft.com  userType: Member  external (#EXT#): True
+--- 2. create cloud-only admin for license activation ---
+  create user exit=2  upn: <email>
+  Global Administrator assigned exit=1
+  NOTE: attempt 1 above failed before any change (password generator used System.Web, not available in PowerShell 7; nothing created). Retried below.
+  attempt 2: create user exit=0  upn: <email>
+  attempt 2: Global Administrator assigned exit=0
+--- 3. P2 trial ---
+  Activated as labadmin: 'Microsoft Entra ID P2 Trial', 100 licenses, unit price 'Free trial', purchase 2026-11-04.
+  FINDING: setting Recurring billing = Off on the free trial switched it to 'Disabled' (data deleted 12/4/2026) while Graph still reported capabilityStatus=Enabled. Fixed with Reactivate subscription.
+  Final state: Status Active; Recurring billing 'Off, expires on 12/4/2026'. Second P2 subscription: none
+--- 4. tenant licenses ---
+  AAD_PREMIUM_P2       status=Enabled   units=100 assigned=0
+--- 5. Lab Admin directory roles ---
+  Global Administrator
+--- 6. SSPR before Scenario 8 (portal) ---
+  Self service password reset enabled: None

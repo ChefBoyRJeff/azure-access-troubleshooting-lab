@@ -1,0 +1,46 @@
+=== Scenario 8 M2: SSPR scoped to grp-dyn-finance, 2026-11-04 13:52 ===
+--- config (portal) ---
+  SSPR enabled: Selected -> grp-dyn-finance; methods required: 1; require registration at sign-in: Yes
+  Authentication methods policy - Microsoft Authenticator: Enabled, All users
+--- Alex: group membership and licenses before the test ---
+  member of grp-dyn-finance: true
+  licenses assigned to Alex: 0 
+--- TEST 1: unlicensed Alex at passwordreset.microsoftonline.com (13:59) ---
+  result: Your password has been reset
+  FINDING: hypothesis NOT confirmed - unlicensed in-scope user completed SSPR. Matches Microsoft licensing doc: tenant services can't always limit benefits to licensed users; license still required for compliance.
+--- audit log: self-service resets (Graph directoryAudits, last 2h) ---
+  13:13:24  Change password (self-service)                result=success  target=Lab Admin (Scenario 8)
+  13:51:22  Update SSPR Settings                          result=success  target=Lab Admin (Scenario 8)
+  13:56:30  Change password (self-service)                result=failure  target=Alex Finance (S8)
+  13:57:04  Change password (self-service)                result=success  target=Alex Finance (S8)
+  13:58:20  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:20  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:29  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:43  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:43  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:57  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:59  Reset password (self-service)                 result=success  target=Alex Finance (S8)
+  13:58:59  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+--- NEGATIVE TEST: Casey (Sales, not in grp-dyn-finance) at passwordreset.microsoftonline.com ---
+  result: You can't reset your own password because password reset isn’t turned on for your account.
+  FINDING: hypothesis NOT confirmed - unlicensed in-scope user completed SSPR. Matches Microsoft licensing doc: tenant services can't always limit benefits to licensed users; license still required for compliance (fixed in M3 with group-based licensing).
+--- audit log: self-service password events (last 2h) ---
+  13:13:24  Change password (self-service)                result=success  target=Lab Admin (Scenario 8)
+  13:51:22  Update SSPR Settings                          result=success  target=Lab Admin (Scenario 8)
+  13:56:30  Change password (self-service)                result=failure  target=Alex Finance (S8)
+  13:57:04  Change password (self-service)                result=success  target=Alex Finance (S8)
+  13:58:20  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:20  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:29  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:43  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:43  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:57  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  13:58:59  Reset password (self-service)                 result=success  target=Alex Finance (S8)
+  13:58:59  Self-service password reset flow activity progress result=success  target=Alex Finance (S8)
+  14:00:40  Self-service password reset flow activity progress result=success  target=Casey Sales (S8)
+  14:00:40  Self-service password reset flow activity progress result=failure  target=Casey Sales (S8)
+--- NEGATIVE TESTS at passwordreset.microsoftonline.com ---
+  (negative-test results taken from the audit log below instead of typed messages)
+--- NEGATIVE TESTS (audit log): out-of-scope users at passwordreset.microsoftonline.com ---
+  14:00:40  Self-service password reset flow activity progress result=success  target=Casey Sales (S8)  reason=User submitted their user ID
+  14:00:40  Self-service password reset flow activity progress result=failure  target=Casey Sales (S8)  reason=This user is not a member of the password reset users group. Add this user to that group to resolve this.
