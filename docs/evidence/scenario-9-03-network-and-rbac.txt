@@ -1,0 +1,19 @@
+=== Scenario 9 M3: service endpoint + vault firewall, then authorization, 2026-11-04 16:07 ===
+  M2 result carried forward: token OK (len 1860), vault GET curl_exit=28 (timeout) = network layer
+--- config after portal change ---
+  subnet serviceEndpoints: Microsoft.KeyVault (Succeeded)
+  vault defaultAction=Deny  bypass=AzureServices  vnetRules=1  ipRules=0
+    allowed subnet: .../vnet-s9/subnets/snet-app
+--- TEST 2 from VM (16:07): service endpoint + firewall allows subnet, still no role ---
+  imds token length: 1860
+  vault GET secret: curl_exit=0 http=403
+  body: {"error":{"code":"Forbidden","message":"Caller is not authorized to perform action on resource.
+  RESULT TEST 2: http=403 Forbidden ('Caller is not authorized') - the network is fixed; failure moved to authorization
+--- REMEDIATION: Key Vault Secrets User for the VM identity, scoped to ONE secret ---
+  assign exit=0
+  Key Vault Secrets User	/subscriptions/<sub>/resourceGroups/rg-s9-keyvault/providers/Microsoft.KeyVault/vaults/kv-s9-kaihzl/secrets/app-db-password
+--- TEST 3 from VM: after the role (retries while RBAC applies) ---
+  (16:10, +0.5 min after the assignment)
+  GET app-db-password (granted): http=200  value length=33 (value not printed)
+  LIST secrets (vault scope, not granted): http=403  code=Forbidden / ForbiddenByRbac
+  SET a new secret (write, not granted): http=403  code=Forbidden / ForbiddenByRbac

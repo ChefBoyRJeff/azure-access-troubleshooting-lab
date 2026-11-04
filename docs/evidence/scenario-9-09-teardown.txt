@@ -1,0 +1,23 @@
+=== Scenario 9 teardown, 2026-11-04 16:22 ===
+  final what-if before teardown: 1 to modify (reference() noise only), 2 no change - code matches live
+--- 0. inventory ---
+  Microsoft.Compute/disks x1
+  Microsoft.Compute/virtualMachines x1
+  Microsoft.KeyVault/vaults x1
+  Microsoft.Network/networkInterfaces x1
+  Microsoft.Network/virtualNetworks x1
+  role assignments scoped inside rg-s9-keyvault: 2
+--- 1. delete resource group (VM, disk, NIC, VNet, vault, VM identity) ---
+  delete rg-s9-keyvault exit=0
+--- 2. purge the soft-deleted vault (frees the name; purge protection was off) ---
+  vault in soft-deleted state: True
+  purge kv-s9-kaihzl exit=0
+--- 3. orphaned role assignments (scope gone) ---
+  remaining assignments scoped to the deleted RG: 0
+--- 4. verify ---
+  rg-s9-keyvault exists: false
+  soft-deleted vault kv-s9-kaihzl still present: False
+  vault name available again: true
+  assignments scoped to rg-s9-keyvault: 0
+  running VMs in subscription: 0
+  KEPT: root-scope User Access Administrator (accepted risk, owner decision)

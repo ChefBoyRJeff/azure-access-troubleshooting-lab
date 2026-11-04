@@ -1,0 +1,11 @@
+=== Scenario 9 M4: authentication vs authorization from the VM, 2026-11-04 16:10 ===
+  token audiences: vault token aud=<guid>; arm token aud=https://management.azure.com/
+  A no Authorization header              http=401  Unauthorized / None / AKV10000: Request is missing a Bearer, PoP, or MTLS_POP token.
+      WWW-Authenticate: Bearer authorization="https://login.microsoftonline.com/<tenant>
+  B token for ARM (wrong audience)       http=401  Unauthorized / None / AKV10022: Invalid audience. Expected <guid>, found: https://
+      WWW-Authenticate: Bearer authorization="https://login.microsoftonline.com/<tenant>
+  C tampered token (signature broken)    http=401  Unauthorized / None / [Unknown] Error validating token: 'S2S12086'.
+      WWW-Authenticate: Bearer authorization="https://login.microsoftonline.com/<tenant>
+  D correct Key Vault token              http=200  None / None / 
+      
+  note: vault token aud is Key Vault's application ID (shown as <guid>); AKV10022 expects that ID

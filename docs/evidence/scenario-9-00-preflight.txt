@@ -1,0 +1,22 @@
+=== Scenario 9 preflight: Key Vault + managed identity, 2026-11-04 15:19 ===
+--- 1. signed in to own profile, lab subscription ---
+  own profile (not labtester): True  subscription: AZ104_PracticeSubscription
+--- 2. resource providers ---
+  Microsoft.KeyVault : Registered
+  Microsoft.Compute : Registered
+  Microsoft.Network : Registered
+--- 3. B1s available in eastus (empty restrictions = available) ---
+  restrictions: 'NotAvailableForSubscription'
+--- 4. soft-deleted vaults already in the subscription ---
+  count: 0
+--- 5. resource group + vault name ---
+  create rg-s9-keyvault exit=0
+  vault name available: true  name: kv-s9-kaihzl
+  FINDING: Standard_B1s restricted in eastus for this subscription (NotAvailableForSubscription); testing alternatives cheapest-first.
+--- 3b. cheap VM sizes (empty restrictions = available) ---
+  eastus   Standard_B2ats_v2    exists=True restrictions=''
+  eastus   Standard_B1ls        exists=True restrictions='NotAvailableForSubscription'
+  eastus   Standard_B2pts_v2    exists=True restrictions=''
+  eastus   Standard_B2s         exists=True restrictions='NotAvailableForSubscription'
+  eastus   Standard_B2als_v2    exists=True restrictions=''
+  SELECTED: Standard_B2ats_v2 in eastus

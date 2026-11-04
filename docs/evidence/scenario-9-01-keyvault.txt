@@ -1,0 +1,17 @@
+=== Scenario 9 M1: Key Vault (RBAC model) created in portal, 2026-11-04 15:38 ===
+--- vault config ---
+  name=kv-s9-kaihzl  rbacModel=True  softDeleteDays=7  purgeProtection=False  publicAccess=Enabled  defaultAction=Allow
+--- my role assignments that apply to the vault (incl. inherited) ---
+  User Access Administrator	/
+  Owner	/subscriptions/<sub>
+--- data-plane test from CLI: list secrets ---
+  exit=1  ERROR: (Forbidden) Caller is not authorized to perform action on resource. 
+--- diagnosis ---
+  portal: 'The operation is not allowed by RBAC' creating app-db-password; CLI: (Forbidden) on secret list
+  ROOT CAUSE: Owner/User Access Administrator are control-plane roles (no dataActions); RBAC-model vault needs a Key Vault data role. Network ruled out: defaultAction=Allow.
+  FINDING: User Access Administrator at root '/' (elevated access for Azure resources left on) - flagged for removal at teardown, not changed here.
+--- remediation: Key Vault Secrets Officer for me at vault scope (portal) ---
+  Key Vault Secrets Officer	/subscriptions/<sub>/resourceGroups/rg-s9-keyvault/providers/Microsoft.KeyVault/vaults/kv-s9-kaihzl
+--- verification (retries up to 5 min for RBAC propagation) ---
+  list secrets exit=0  names: app-db-password  (+0 min)
+  read app-db-password: exit=0  value length=33 (value not printed)

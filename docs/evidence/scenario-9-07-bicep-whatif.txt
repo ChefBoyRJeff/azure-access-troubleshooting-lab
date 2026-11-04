@@ -1,0 +1,75 @@
+=== Scenario 9: Bicep vs live (what-if only, no deploy), 2026-11-04 16:16 ===
+  bicep build (lint) exit=0
+  what-if exit=0
+  Note: The result may contain false positive predictions (noise).
+  You can help us improve the accuracy of the result by opening an issue here: https://aka.ms/WhatIfIssues
+  NOTICE! - Want to get What-if without noise? Move to Deployment Stacks What-If https://aka.ms/stackswhatifGA
+  Resource and property changes are indicated with these symbols:
+    - Delete
+    + Create
+    ~ Modify
+    = Nochange
+    * Ignore
+    x Noeffect
+  The deployment will update the following scope:
+  Scope: /subscriptions/<guid>/resourceGroups/RG-S9-KEYVAULT
+    ~ Microsoft.KeyVault/vaults/kv-s9-kaihzl [2023-07-01]
+      + tags:
+          owner:   "lab"
+          project: "scenario-9"
+          purpose: "keyvault-mi-lab"
+      ~ properties.networkAcls.virtualNetworkRules: [
+        ~ 0:
+          ~ id: "/subscriptions/<guid>/resourcegroups/rg-s9-keyvault/providers/microsoft.network/virtualnetworks/vnet-s9/subnets/snet-app" => "[reference('/subscriptions/<guid>/resourceGroups/rg-s9-keyvault/providers/Microsoft.Network/virtualNetworks/vnet-s9', '2024-05-01').subnets[0].id]"
+        ]
+      x properties.networkAcls.virtualNetworkRules[0].ignoreMissingVnetServiceEndpoint: false
+    ~ Microsoft.Network/virtualNetworks/vnet-s9 [2024-05-01]
+      - properties.privateEndpointVNetPolicies: "Disabled"
+    = Microsoft.KeyVault/vaults/kv-s9-kaihzl/secrets/app-db-password/providers/Microsoft.Authorization/roleAssignments/<guid> [2022-04-01]
+      x properties.principalType: "ServicePrincipal"
+    * Microsoft.Compute/disks/vm-s9-app_OsDisk_1_bbd3debb2a5440e680264deb4506f26a
+    * Microsoft.Compute/virtualMachines/vm-s9-app
+    * Microsoft.Network/networkInterfaces/nic-s9-app
+  Resource changes: 2 to modify, 1 no change, 3 to ignore.
+--- TRIAGE ---
+  REAL (live): vault untagged (portal; RG tags don't inherit) -> tag the live vault to match the template
+  REAL (code): vnet privateEndpointVNetPolicies undeclared default (same as P3 RCA-002) -> declared in Bicep
+  NOISE: subnet id shown as unresolved reference() + case difference; 'x' Noeffect properties
+  OK: role assignment NoChange - adopted the CLI-created name (avoids Scenario 7 RoleAssignmentExists)
+--- FIX (live): tag vault exit=0 ---
+  bicep build after code fix exit=0
+--- WHAT-IF PASS 2 (exit=0) ---
+    - Delete
+    ~ Modify
+    = Nochange
+    * Ignore
+    x Noeffect
+    ~ Microsoft.KeyVault/vaults/kv-s9-kaihzl [2023-07-01]
+      ~ properties.networkAcls.virtualNetworkRules: [
+        ~ 0:
+          ~ id: "/subscriptions/<guid>/resourcegroups/rg-s9-keyvault/providers/microsoft.network/virtualnetworks/vnet-s9/subnets/snet-app" => "[reference('/subscriptions/<guid>/resourceGroups/rg-s9-keyvault/providers/Microsoft.Network/virtualNetworks/vnet-s9', '2024-05-01').subnets[0].id]"
+      x properties.networkAcls.virtualNetworkRules[0].ignoreMissingVnetServiceEndpoint: false
+    ~ Microsoft.Network/virtualNetworks/vnet-s9 [2024-05-01]
+      - properties.privateEndpointVNetPolicies: "Disabled"
+    = Microsoft.KeyVault/vaults/kv-s9-kaihzl/secrets/app-db-password/providers/Microsoft.Authorization/roleAssignments/<guid> [2022-04-01]
+      x properties.principalType: "ServicePrincipal"
+    * Microsoft.Compute/disks/vm-s9-app_OsDisk_1_bbd3debb2a5440e680264deb4506f26a
+    * Microsoft.Compute/virtualMachines/vm-s9-app
+    * Microsoft.Network/networkInterfaces/nic-s9-app
+  Resource changes: 2 to modify, 1 no change, 3 to ignore.
+  NOTE: pass 2 still showed the vnet drift - an open VS Code tab had saved the old file over the fix. Corrected file moved into place; pass 3 below.
+  ACCEPTED RISK: User Access Administrator at root '/' (elevated access) kept on by owner decision for this single-admin lab; in production it would be turned off after use.
+  bicep build exit=0
+--- WHAT-IF PASS 3 (exit=0) ---
+    ~ Microsoft.KeyVault/vaults/kv-s9-kaihzl [2023-07-01]
+      ~ properties.networkAcls.virtualNetworkRules: [
+        ~ 0:
+          ~ id: "/subscriptions/<guid>/resourcegroups/rg-s9-keyvault/providers/microsoft.network/virtualnetworks/vnet-s9/subnets/snet-app" => "[reference('/subscriptions/<guid>/resourceGroups/rg-s9-keyvault/providers/Microsoft.Network/virtualNetworks/vnet-s9', '2024-05-01').subnets[0].id]"
+      x properties.networkAcls.virtualNetworkRules[0].ignoreMissingVnetServiceEndpoint: false
+    = Microsoft.KeyVault/vaults/kv-s9-kaihzl/secrets/app-db-password/providers/Microsoft.Authorization/roleAssignments/<guid> [2022-04-01]
+      x properties.principalType: "ServicePrincipal"
+    = Microsoft.Network/virtualNetworks/vnet-s9 [2024-05-01]
+    * Microsoft.Compute/disks/vm-s9-app_OsDisk_1_bbd3debb2a5440e680264deb4506f26a
+    * Microsoft.Compute/virtualMachines/vm-s9-app
+    * Microsoft.Network/networkInterfaces/nic-s9-app
+  Resource changes: 1 to modify, 2 no change, 3 to ignore.

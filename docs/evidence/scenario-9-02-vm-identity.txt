@@ -1,0 +1,26 @@
+=== Scenario 9 M2: VM + system-assigned identity in a private subnet, 2026-11-04 15:42 ===
+  vnet-s9 exit=0
+  snet-app exit=0
+  nic-s9-app (no public IP) exit=0
+  vm-s9-app exit=1 (admin password random, never displayed)
+--- verify ---
+  FINDING: vm create failed preflight validation - QuotaExceeded: standardBasv2Family cores in eastus, limit 0. The SKU check (restrictions) passed; quota is a separate control. Nothing billed; VNet/subnet/NIC kept.
+--- size selection: restrictions AND quota (cheapest candidates first) ---
+  Standard_B2ats_v2    family=standardBasv2Family      vCPUs=2 quotaFree=0 restrictions=''
+  Standard_B2pts_v2    family=standardBpsv2Family      vCPUs=2 quotaFree=0 restrictions=''
+  Standard_B1ms        family=standardBSFamily         vCPUs=1 quotaFree=10 restrictions='NotAvailableForSubscription'
+  Standard_B2als_v2    family=standardBasv2Family      vCPUs=2 quotaFree=0 restrictions=''
+  Standard_D2als_v6    family=standardDalv6Family      vCPUs=2 quotaFree=10 restrictions=''
+  Standard_D2as_v5     family=standardDASv5Family      vCPUs=2 quotaFree=0 restrictions=''
+  Standard_D2s_v5      family=standardDSv5Family       vCPUs=2 quotaFree=0 restrictions=''
+  total regional vCPUs free: 10
+  SELECTED: Standard_D2als_v6  image: Ubuntu2404
+  vm-s9-app create exit=0 (admin password random, never displayed)
+--- verify ---
+  subnet defaultOutboundAccess=False  serviceEndpoints=0
+  vm size=Standard_D2als_v6  power=VM running  privateIp=10.90.1.4  publicIp=''  identity=SystemAssigned
+  identity role assignments (any scope): 0
+--- TEST 1 from VM (15:57): private subnet, no service endpoint, no role ---
+  dns: 20.42.64.44
+  imds token length: 1860
+  vault GET secret: curl_exit=28 http=000

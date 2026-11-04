@@ -1,0 +1,13 @@
+=== Scenario 9 M5: vault firewall vs the Owner, 2026-11-04 16:12 ===
+--- SYMPTOM: Owner + Secrets Officer, data-plane read from my laptop ---
+  secret show exit=1
+  error: ERROR: (Forbidden) Client address is not authorized and caller is not a trusted service. | Client address: <ip> | Code: Forbidden
+--- control plane through ARM (expect OK: the firewall only guards the data plane) ---
+  vault show exit=0
+  my roles on the vault: User Access Administrator, Owner, Key Vault Secrets Officer
+  ROOT CAUSE: networkAcls defaultAction=Deny, only snet-app allowed; my public IP not in ipRules. RBAC is fine - no role can fix a firewall block.
+--- REMEDIATION: allow my single IP (/32) for the rest of the lab; removed at teardown ---
+  add ip rule exit=0
+--- VERIFY (retries while the rule applies) ---
+  secret show exit=0 name=app-db-password (+0 min)
+  rules now: defaultAction=Deny vnetRules=1 ipRules=1 (<ip>/32)
