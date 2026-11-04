@@ -1,0 +1,30 @@
+=== Scenario 7 step 5: Modify (inherit costCenter) at create time + remediation ===
+--- 5a: existing resources missing costCenter in resource groups that HAVE it (remediation candidates) ---
+candidates: 1
+  rg-backup-lab / bv-backup-lab (Microsoft.DataProtection/BackupVaults)
+--- 5b: Modify at create time (enforced): new NSG with NO tags in a tagged throwaway RG ---
+create rg-s7-modify (tagged) exit=0
+create nsg-s7-test with no --tags exit=0
+nsg-s7-test tags after create: {"costCenter":"CC-1001"}
+cleanup rg-s7-modify exit=0
+--- 5c: remediation task (portal), scope = subscription, re-evaluate first ---
+12:05:31  + 0.0 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:06:33  + 1.0 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:07:34  + 2.1 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:08:36  + 3.1 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:09:37  + 4.1 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:10:38  + 5.1 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:11:40  + 6.2 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:12:41  + 7.2 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:13:42  + 8.2 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:14:44  + 9.2 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:15:45  +10.2 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:16:46  +11.3 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:17:48  +12.3 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:18:50  +13.3 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:19:51  +14.4 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:20:53  +15.4 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:21:54  +16.4 min  task=49bd750e17635d1184fad1a0 state=Evaluating succeeded=0 failed=0 total=0
+12:22:55  +17.4 min  task=49bd750e17635d1184fad1a0 state=Succeeded succeeded=1 failed=0 total=1
+discovery mode: ReEvaluateCompliance
+bv-backup-lab costCenter now: CC-1001

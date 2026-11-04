@@ -1,0 +1,41 @@
+=== Scenario 7 step 3: initiative 'Lab governance baseline' (portal) + assignment at mg-lab (CLI, DoNotEnforce) ===
+initiative: Lab governance baseline, policies inside: 4, parameters: allowedLocations, tagName
+assignment exit=0
+assignment: Lab governance baseline (mg-lab)  enforcementMode=DoNotEnforce  identity=SystemAssigned
+policy identity granted Tag Contributor at mg-lab exit=0
+identity's roles: Tag Contributor
+--- start a compliance scan (results take several minutes) ---
+trigger-scan exit=0 at 11:14:15
+--- compliance for lab-baseline (DoNotEnforce: reported, not blocked) ---
+11:18:30  + 0.1 min  states returned: 0
+11:19:33  + 1.1 min  states returned: 0
+11:20:36  + 2.2 min  states returned: 0
+11:21:37  + 3.2 min  states returned: 10
+  Allowed locations, Compliant                  5
+  Inherit tag from RG, Compliant                5
+--- non-compliant items ---
+--- open question from step 1: does the subscription-scope listing show an inherited MG assignment? ---
+Assignment                                                        Scope
+----------------------------------------------------------------  ---------------------------------------------------
+Block costly lab resources                                        /subscriptions/<guid>
+ASC Default (subscription: <guid>)  /subscriptions/<guid>
+NOTE: the loop above stopped at the first non-empty result (10 states at +3.2 min) while the scan was still running; RG-level policies (mode All) had no states yet. Re-read below.
+ANSWER to the open question: even with lab-baseline assigned at mg-lab, 'az policy assignment list --disable-scope-strict-match' at subscription scope lists only subscription-scope assignments (this CLI version). It does not reveal MG-inherited policy.
+--- complete re-read 11:33:32 ---
+states returned: 10
+  Allowed locations, Compliant                  5
+  Inherit tag from RG, Compliant                5
+--- non-compliant items ---
+--- DIAGNOSIS: 10 states unchanged 11:21 -> 11:33; RG policies missing; only 5 resources evaluated ---
+which resources (MG-scope query):
+  /resourcegroups/rg-cicd-dev/providers/microsoft.network/virtualnetworks/vnet-dev
+  /resourcegroups/rg-hubspoke-lab/providers/microsoft.network/virtualnetworks/vnet-hub
+  /resourcegroups/rg-hubspoke-lab/providers/microsoft.network/virtualnetworks/vnet-spoke2
+  /resourcegroups/rg-hubspoke-lab/providers/microsoft.network/virtualnetworks/vnet-spoke1
+  /resourcegroups/rg-cicd-prod/providers/microsoft.network/virtualnetworks/vnet-prod
+--- H-B: same filter at SUBSCRIPTION scope ---
+states returned (subscription scope): 10
+  Allowed locations, Compliant                  5
+  Inherit tag from RG, Compliant                5
+--- platform summary for the assignment ---
+FINDING: after about 20 min only 5 VNets (3 RGs) evaluated; NSGs, route tables, P2/P3/P5 resources and all RG-level policies not yet evaluated. Same at MG and subscription scope (rules out query scope). Interpretation: first full evaluation still in progress (unconfirmed). Re-read at the end of the scenario.

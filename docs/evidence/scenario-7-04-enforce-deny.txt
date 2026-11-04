@@ -1,0 +1,28 @@
+=== Scenario 7 step 4: enforce lab-baseline, planned failure ===
+tag rg-hubspoke-lab costCenter=CC-1001 exit=0
+rg-hubspoke-lab costCenter now: CC-1001
+enforcementMode now: Default
+--- T1 (planned failure): RG in westus, tag present ---
+11:36:20  + 0.0 min  T1 exit=1
+T1 error code: RequestDisallowedByPolicy
+--- T2: RG in eastus, NO costCenter tag (expect Deny by 'Require a tag') ---
+T2 exit=1 code: RequestDisallowedByPolicy
+--- T3: RG in eastus WITH costCenter (expect success = policy allows compliant requests) ---
+T3 exit=0
+T3 cleanup delete exit=0
+leftover test RGs (re-check, filtered in PowerShell): []
+--- 4d diagnosis: what the T1 / T2 errors name ---
+T1 westus:  assignment=Lab governance baseline (mg-lab)  scope=/providers/Microsoft.Management/managementGroups/mg-lab
+           policy=Allowed locations for resource groups  initiative=Lab governance baseline
+T2 no tag:  assignment=Lab governance baseline (mg-lab)  scope=/providers/Microsoft.Management/managementGroups/mg-lab
+           policy=Require a tag on resource groups  initiative=Lab governance baseline
+--- what the requester saw when checking the subscription (no mg-lab assignment) ---
+  Block costly lab resources
+  ASC Default (subscription: <guid>)
+--- the assignment named in the error, looked up at its real scope ---
+{
+  "enforcementMode": "Default",
+  "locations": null,
+  "name": "Lab governance baseline (mg-lab)",
+  "scope": "/providers/Microsoft.Management/managementGroups/mg-lab"
+}

@@ -1,0 +1,90 @@
+=== Scenario 7: Bicep (management-group scope) lint + what-if vs the portal/CLI-built baseline ===
+
+lint exit=0
+Note: The result may contain false positive predictions (noise).
+You can help us improve the accuracy of the result by opening an issue here: https://aka.ms/WhatIfIssues
+NOTICE! - Want to get What-if without noise? Move to Deployment Stacks What-If https://aka.ms/stackswhatifGA
+
+Resource and property changes are indicated with these symbols:
+  - Delete
+  + Create
+  ~ Modify
+
+The deployment will update the following scope:
+
+Scope: /providers/Microsoft.Management/ManagementGroups/mg-lab
+
+  + Microsoft.Authorization/roleAssignments/<guid> [2022-04-01]
+
+      apiVersion:                  "2022-04-01"
+      id:                          "/providers/Microsoft.Management/managementGroups/mg-lab/providers/Microsoft.Authorization/roleAssignments/<guid>"
+      name:                        "<guid>"
+      properties.principalId:      "[reference('/providers/Microsoft.Management/managementGroups/mg-lab/providers/Microsoft.Authorization/policyAssignments/lab-baseline', '2025-01-01', 'full').identity.principalId]"
+      properties.roleDefinitionId: "/providers/Microsoft.Authorization/roleDefinitions/<guid>"
+      type:                        "Microsoft.Authorization/roleAssignments"
+
+  ~ Microsoft.Authorization/policyAssignments/lab-baseline [2025-01-01]
+    - properties.definitionVersion: "1.*.*"
+
+  ~ Microsoft.Authorization/policySetDefinitions/9ffe7bb83c325a0ab4f354fa [2025-01-01]
+    - properties.parameters.allowedLocations.metadata.assignPermissions: false
+    - properties.parameters.allowedLocations.metadata.portalReview:      false
+    - properties.parameters.tagName.metadata.assignPermissions:          false
+    - properties.parameters.tagName.metadata.portalReview:               false
+    - properties.version:                                                "1.0.0"
+    - properties.versions: [
+        0: "1.0.0"
+      ]
+    ~ properties.policyDefinitions: [
+      ~ 0:
+
+        - definitionVersion: "1.1.*"
+
+      ~ 1:
+
+        - definitionVersion: "1.1.*"
+
+      ~ 2:
+
+        - definitionVersion: "1.0.*"
+
+      ~ 3:
+
+        - definitionVersion: "1.0.*"
+
+      ]
+
+Resource changes: 1 to create, 2 to modify.
+=== what-if pass 2: after declaring definitionVersion / version / metadata ===
+Note: The result may contain false positive predictions (noise).
+You can help us improve the accuracy of the result by opening an issue here: https://aka.ms/WhatIfIssues
+NOTICE! - Want to get What-if without noise? Move to Deployment Stacks What-If https://aka.ms/stackswhatifGA
+
+Resource and property changes are indicated with these symbols:
+  - Delete
+  + Create
+  ~ Modify
+  = Nochange
+
+The deployment will update the following scope:
+
+Scope: /providers/Microsoft.Management/ManagementGroups/mg-lab
+
+  + Microsoft.Authorization/roleAssignments/<guid> [2022-04-01]
+
+      apiVersion:                  "2022-04-01"
+      id:                          "/providers/Microsoft.Management/managementGroups/mg-lab/providers/Microsoft.Authorization/roleAssignments/<guid>"
+      name:                        "<guid>"
+      properties.principalId:      "[reference('/providers/Microsoft.Management/managementGroups/mg-lab/providers/Microsoft.Authorization/policyAssignments/lab-baseline', '2025-01-01', 'full').identity.principalId]"
+      properties.roleDefinitionId: "/providers/Microsoft.Authorization/roleDefinitions/<guid>"
+      type:                        "Microsoft.Authorization/roleAssignments"
+
+  ~ Microsoft.Authorization/policySetDefinitions/9ffe7bb83c325a0ab4f354fa [2025-01-01]
+    - properties.versions: [
+        0: "1.0.0"
+      ]
+
+  = Microsoft.Authorization/policyAssignments/lab-baseline [2025-01-01]
+
+Resource changes: 1 to create, 1 to modify, 1 no change.
+TRIAGE: remaining '+ roleAssignments' = name mismatch only (CLI random name vs template guid()); a deploy would fail RoleAssignmentExists for the same principal/role/scope. Not deployed. 'versions' list (if shown) = computed by the service.

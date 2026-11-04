@@ -1,0 +1,21 @@
+=== Scenario 7 step 1: mg-lab > mg-lab-sandbox created in the portal; subscription moved ===
+{
+  "children": [
+    {
+      "children": [
+        "AZ104_PracticeSubscription"
+      ],
+      "name": "Lab Sandbox",
+      "type": "Microsoft.Management/managementGroups"
+    }
+  ],
+  "mg": "Lab",
+  "parent": "Tenant Root Group"
+}
+subscription parent now: /providers/Microsoft.Management/managementGroups/mg-lab-sandbox
+--- inherited policy assignments still visible at subscription scope ---
+Assignment                                                        Scope
+----------------------------------------------------------------  ---------------------------------------------------
+Block costly lab resources                                        /subscriptions/<guid>
+ASC Default (subscription: <guid>)  /subscriptions/<guid>
+OPEN QUESTION: --disable-scope-strict-match at subscription scope did NOT list the 3 root (Microsoft-managed) assignments right after the move. Unconfirmed whether propagation delay or CLI behavior; re-tested in step 4 with an mg-lab assignment.

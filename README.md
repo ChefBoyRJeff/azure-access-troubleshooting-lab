@@ -4,7 +4,7 @@ Hands-on lab that reproduces, diagnoses, and fixes real Azure "access denied" pr
 
 > Environment: personal Azure lab subscription. This is hands-on lab work, not production experience.
 
-> **Status (2026-11-01):** All six scenarios are complete and documented. The Azure resources were **torn down** on 2026-11-01 ([evidence](docs/evidence/teardown-2026-11-01.txt)). The Entra test user, group, and custom policy definitions were kept, so the baseline can be redeployed with `main.bicep` for the [live demo](docs/interview-guide.md).
+> **Status (2026-11-04):** All seven scenarios are complete and documented. Scenarios 1-6 were **torn down** on 2026-11-01 ([evidence](docs/evidence/teardown-2026-11-01.txt)); Scenario 7 (management groups and a policy initiative) was built and **torn down** on 2026-11-04 ([evidence](docs/evidence/scenario-7-09-teardown.txt)). The Entra test user and group were kept, so the baseline can be redeployed with `main.bicep` for the [live demo](docs/interview-guide.md). *Correction:* an earlier version of this note said custom policy definitions were kept; the 2026-11-04 preflight found none in the subscription.
 
 ## Problem It Solves
 
@@ -18,7 +18,7 @@ The first diagnostic step is the error code: it tells you **which control** bloc
 |---|---|---|---|
 | `AuthorizationFailed` | RBAC: **who** the caller is | ✅ Yes | [1](docs/scenario-1-wrong-scope-rbac.md), [4](docs/scenario-4-policy-remediation-identity.md), [5](docs/scenario-5-storage-data-plane.md) |
 | `ScopeLocked` | Resource lock: **protection** | ❌ No, even Owners are blocked | [2](docs/scenario-2-readonly-lock.md) |
-| `RequestDisallowedByPolicy` | Azure Policy: **what** is deployed | ❌ No, the request must comply | [3](docs/scenario-3-policy-deny.md) |
+| `RequestDisallowedByPolicy` | Azure Policy: **what** is deployed. The error names the assignment and its scope, which may be a **management group** | ❌ No, the request must comply | [3](docs/scenario-3-policy-deny.md), [7](docs/scenario-7-management-groups-initiative.md) |
 | `AuthorizationPermissionMismatch` | Storage data-plane RBAC: valid identity, no **data** role | ✅ Yes, a Storage ... Data role | [5](docs/scenario-5-storage-data-plane.md) |
 | `AuthenticationFailed` / `NoAuthenticationInformation` | **Authentication**: credential invalid or missing | ❌ No, fix the credential | [5](docs/scenario-5-storage-data-plane.md) |
 | `AuthorizationFailure` | Storage **firewall**: request from a network that isn't allowed (checked before credentials) | ❌ No, fix the network rules | [6](docs/scenario-6-storage-firewall.md) |
@@ -65,6 +65,7 @@ flowchart TB
 | [4](docs/scenario-4-policy-remediation-identity.md) | "The auto-tag policy isn't fixing anything" | Policy managed identity had no role | Tag Contributor (not the declared Contributor), proven by a successful remediation | Read the failing action to choose the narrowest role |
 | [5](docs/scenario-5-storage-data-plane.md) | "I can't read the blob" | Reader (control plane) assigned; no data-plane role | Storage Blob Data Reader on the container; Reader removed (lock lifted briefly, with approval) | Owner and Reader don't grant data access; keys bypass RBAC |
 | [6](docs/scenario-6-storage-firewall.md) | "Not authorized from home" | Storage firewall set to Deny with only the office IP allowed | Allowed the caller's single IP; RBAC unchanged; redeploy verified the firewall persists | `AuthorizationFailure` is the network, not RBAC; keys can't bypass the firewall |
+| [7](docs/scenario-7-management-groups-initiative.md) | "I can't create a resource group, and there's no policy on our subscription" | Initiative (locations + `costCenter` tagging) assigned at a **management group** two levels up, inherited by the subscription | Compliant requests; tagged our own RG; **exemptions** (Waiver, expiry) for Azure-managed RGs; remediation task with a Tag Contributor identity; Bicep at MG scope | Read the error's assignment scope; subscription views don't show MG-inherited policy; audit (DoNotEnforce) before Deny |
 
 Each scenario document links its evidence in [`docs/evidence/`](docs/evidence/).
 
@@ -74,6 +75,7 @@ Each scenario document links its evidence in [`docs/evidence/`](docs/evidence/).
 |---|---|
 | `main.bicep` | Subscription-scope deployment: tagged resource groups + workload module |
 | `modules/workload.bicep` | Baseline VNet and private storage account (`reports` container) in `rg-access-lab-app` |
+| `governance/lab-baseline.bicep` | Scenario 7: initiative, assignment and least-privilege policy identity, deployed at **management-group** scope (`az deployment mg`) |
 | `docs/scenario-*.md` | One root-cause analysis per scenario |
 | `docs/evidence/` | Sanitized command output for every scenario |
 | `docs/interview-guide.md` | Live demo script, walkthrough, and interview questions |
@@ -136,6 +138,7 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 |---|---|
 | Manage Azure identities and governance | Manage built-in Azure roles; assign roles at different scopes; interpret access assignments |
 | Manage Azure identities and governance | Implement and manage Azure Policy; configure resource locks; apply and manage tags; manage resource groups |
+| Manage Azure identities and governance | Manage management groups; assign RBAC and policy at management-group scope; policy initiatives, exemptions and remediation tasks |
 | Manage Azure identities and governance | Create users and groups |
 | Deploy and manage Azure compute resources | Interpret, modify, and deploy Bicep files |
 | Implement and manage storage | Create and configure storage accounts; create and configure a container in Azure Blob Storage; manage access keys; configure Azure Storage firewalls and virtual networks |
@@ -151,6 +154,9 @@ Remove-Item "$HOME\.azure-labtester" -Recurse
 - **Locks protect role assignments too.** The CanNotDelete lock blocked removing an unneeded role assignment, even for an Owner.
 - **Check what a test actually sent.** On Windows, `az` passes arguments through cmd.exe, which split a SAS URL at `&`; `Invoke-WebRequest` sent it intact.
 - **The network is checked first.** A storage firewall rejected even the account key; `AuthorizationFailure` and `AuthorizationPermissionMismatch` differ by one word but need different fixes.
+- **Policy can live above the subscription.** In Scenario 7 a Deny came from a management group two levels up; the subscription's assignment list didn't show it, but the error named its scope.
+- **Audit first, then enforce.** `DoNotEnforce` reported exactly who a Deny would affect before anyone's deployment failed.
+- **Reporting and enforcement run on different clocks.** The first full compliance evaluation took about 45 minutes, and exemptions showed as Exempt only after a re-scan, while enforcement honored them immediately.
 - **Bicep manages only what it declares.** Undeclared firewall rules survived a real redeploy (what-if predicted it, and the deployment confirmed it), unlike the declared tags in Scenario 4.
 
 ## Limitations and Future Improvements

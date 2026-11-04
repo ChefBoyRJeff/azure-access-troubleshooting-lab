@@ -1,0 +1,15 @@
+=== Scenario 7 step 5d: exemptions (Waiver, tag policy only) for Azure-managed RGs ===
+reference ID of 'Require a tag on resource groups' inside the initiative: Require a tag on resource groups_1
+--- BEFORE exemption: update DefaultResourceGroup-EUS (add tag s7test=1), expect Deny ---
+before: exit=1 code=RequestDisallowedByPolicy
+CLI exemption exit=0 expires=2026-11-18T00:00:00Z
+--- exemptions now in place ---
+  NetworkWatcherRG           546b5752cae953e0aad8fe7e  category=Waiver  expires=11/18/2026 12:00:00 AM  refs=Require a tag on resource groups_1
+  DefaultResourceGroup-EUS   ex-s7-defaultrg-eus  category=Waiver  expires=11/17/2026 7:00:00 PM  refs=Require a tag on resource groups_1
+--- AFTER exemption: same update, expect success (retries while it propagates) ---
+12:27:15  + 0.0 min  update exit=0
+cleanup: removed test tag s7test exit=1
+DefaultResourceGroup-EUS tags now: {"s7test":"1"}
+NOTE: 'az group update --remove' failed (CLI deprecation bug: properties_to_remove); test tag still present. Removed with 'az tag update --operation Delete' instead:
+cleanup via az tag update exit=0
+DefaultResourceGroup-EUS tags now: {}

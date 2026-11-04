@@ -180,3 +180,29 @@ Each answer is about 45–60 seconds spoken. They draw on what was actually done
 ### "Someone fixes tags manually in the portal, and a week later a Bicep redeploy removes them again."
 
 "That's configuration drift: the fix was made outside the source of truth. In Bicep, the `tags` property replaces a resource's tags rather than merging them, so any tag not in the template is removed on redeploy. I'd put the fix into the template, standardize tags through a shared parameter or module, and deploy only through a pipeline that runs what-if on every pull request. In my lab, what-if showed the `costCenter` tag being removed before anything was deployed, so I fixed the template first. Azure Policy adds a safety net: Deny to require tags on new resources, and Modify with remediation to fix existing ones."
+
+## 12. Scenario 7: Management Groups and a Policy Initiative
+
+**30-second version:** "I built a management group hierarchy, moved my subscription under it, and assigned an initiative of four built-in policies (allowed locations for resources and resource groups, a required `costCenter` tag, and tag inheritance) at the top management group. I rolled it out in audit mode first, then enforced it and reproduced the classic ticket: a Deny the user can't find on their subscription. The error named the management-group assignment. I exempted the two Azure-managed resource groups with a waiver and an expiry, remediated an existing resource with a Tag Contributor identity, and codified the baseline in Bicep at management-group scope."
+
+**Numbers to quote (from the evidence):** Lab Tester could read the subscription and 7 resource groups via one Reader assignment two levels up; the first full compliance evaluation took about 45 minutes; the remediation task took about 17 minutes with ReEvaluateCompliance; enforcement of the new assignment and of the exemption was immediate.
+
+### Practice questions
+
+**"A deployment fails with RequestDisallowedByPolicy, but the subscription has no matching policy. Where do you look?"**
+In the error first: it names the assignment and its scope. In my lab the scope was `/providers/Microsoft.Management/managementGroups/mg-lab`. Then I'd check the management group hierarchy above the subscription. Listing the subscription's own assignments didn't show the inherited one.
+
+**"Why did your initiative include both 'Allowed locations' and 'Allowed locations for resource groups'?"**
+Plain *Allowed locations* doesn't evaluate resource groups. My West US resource group was denied by the resource-group version.
+
+**"Exemption or exclusion?"**
+An exclusion (`notScopes`) removes the scope from evaluation entirely and leaves no record. An exemption keeps it evaluated, reports it as Exempt with a category (Waiver or Mitigated), a reason and an expiry, and can target one policy inside an initiative. I used exemptions for the two Azure-managed resource groups, only for the tag policy, so the location rules still applied to them.
+
+**"Your Modify policy doesn't fix existing resources. Why?"**
+Modify changes requests at create or update time. Existing resources need a remediation task, which runs as the assignment's managed identity, so that identity needs a role that covers the write. Tag Contributor was enough. I also ticked re-evaluate first, because the initial scan hadn't reached the resource yet, and Microsoft doesn't support that option at management-group scope.
+
+**"How would you roll out a new Deny policy across 50 subscriptions safely?"**
+Assign it at the management group with `DoNotEnforce`, read compliance to see who would be affected, fix or exempt with an expiry, communicate, then switch to enforced. Keep it in code with pinned definition versions.
+
+### Honest boundaries for this scenario
+The management group hierarchy and the subscription move were done in the portal, not in code, because a tenant-scope deployment needs deploy rights at the root. The cause of a second role assignment on the policy identity is a hypothesis (a portal edit granting the definition's Contributor), not confirmed.

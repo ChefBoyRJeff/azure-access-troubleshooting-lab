@@ -1,0 +1,35 @@
+=== Scenario 7 teardown, 2026-11-04 12:35 ===
+--- 1. last compliance read for the exempted RGs ---
+  Exempt       defaultresourcegroup-eus
+  Exempt       networkwatcherrg
+--- 2. exemptions ---
+  delete exemption 546b5752cae953e0aad8fe7e on NetworkWatcherRG exit=0
+  delete exemption ex-s7-defaultrg-eus on DefaultResourceGroup-EUS exit=0
+--- 3. policy identity role (before the assignment) ---
+  removed policy identity role exit=0
+  removed policy identity role exit=0
+--- 4. assignment, then initiative ---
+  delete assignment lab-baseline exit=0
+  delete initiative exit=0
+--- 5. Lab Tester group Reader at mg-lab ---
+  removed group Reader at mg-lab exit=0
+--- 6. subscription back to Tenant Root, then delete MGs (children first) ---
+  move subscription to Tenant Root exit=0
+  delete mg-lab-sandbox exit=0
+  delete mg-lab exit=0
+--- 7. verify ---
+subscription parent: /providers/Microsoft.Management/managementGroups/<tenant-root>
+management groups: az104-mg1, Tenant Root Group, Lab, Lab Sandbox
+exemptions left: 0
+group role assignments left: 0
+westus RG create after teardown (expect allowed now): exit=0
+  removed rg-s7-postcheck exit=0
+--- 8. local cleanup ---
+  Lab Tester CLI profile signed out
+  removed local exports
+back to own profile: yes
+exemptions left: 0 (line re-recorded: the original ran as -FilePath $f-Append and wrote a stray file, now removed)
+FINDING: two role assignments were removed for the policy identity, though only Tag Contributor was granted (CLI) and listed at 11:14. Hypothesis (unconfirmed): the portal edit that enabled enforcement auto-granted the definition's Contributor.
+--- management groups re-check (list lagged right after the deletes) ---
+12:40:41  + 0.2 min  management groups: az104-mg1, Tenant Root Group
+direct lookup mg-lab: ERROR: (NotFound) '/providers/Microsoft.Management/managementGroups/mg-lab' not found Code: NotFound Message: '/providers/Microsoft.Management/managementGroups/mg-lab' not found

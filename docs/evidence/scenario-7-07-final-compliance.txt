@@ -1,0 +1,12 @@
+=== Scenario 7: final compliance read for lab-baseline, 2026-11-04 12:29 ===
+states: 56
+  Allowed locations for RGs, Compliant          8
+  Allowed locations, Compliant                  20
+  Inherit tag from RG, Compliant                20
+  Require tag on RGs, Compliant                 6
+  Require tag on RGs, NonCompliant              2
+--- anything not Compliant ---
+  NonCompliant Require tag on RGs         /resourcegroups/defaultresourcegroup-eus
+  NonCompliant Require tag on RGs         /resourcegroups/networkwatcherrg
+NOTE: the 2 exempted RGs still show NonCompliant: exemptions were created about 5 min earlier; compliance updates on the next evaluation, while enforcement honored the exemption immediately (after-test passed). 8 RG states vs 7 RGs: likely a deleted rg-s7-* test RG not yet aged out (unconfirmed).
+trigger-scan exit=0 at 12:31:21 (re-check Exempt before teardown)

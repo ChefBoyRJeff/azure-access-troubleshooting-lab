@@ -1,0 +1,41 @@
+=== Scenario 7 step 2: Reader for grp-lab-app-contributors at mg-lab; inheritance to the subscription ===
+signed in as (CLI profile .azure-labtester): labtester@<tenant>
+--- BEFORE: subscriptions Lab Tester can see ---
+subscriptions: []
+back to own profile: yes
+--- assignment as stored (my profile) ---
+Role    Scope
+------  -------------------------------------------------------
+Reader  /providers/Microsoft.Management/managementGroups/mg-lab
+--- seen FROM THE SUBSCRIPTION with inheritance included (where admins usually look) ---
+
+--- AFTER: Lab Tester's view (retries while RBAC propagates) ---
+10:58:31  + 0.0 min  subscriptions visible to Lab Tester: []
+10:59:02  + 0.5 min  subscriptions visible to Lab Tester: []
+10:59:32  + 1.0 min  subscriptions visible to Lab Tester: []
+11:00:03  + 1.5 min  subscriptions visible to Lab Tester: []
+11:00:33  + 2.1 min  subscriptions visible to Lab Tester: []
+11:01:04  + 2.6 min  subscriptions visible to Lab Tester: []
+11:01:35  + 3.1 min  subscriptions visible to Lab Tester: []
+11:02:05  + 3.6 min  subscriptions visible to Lab Tester: []
+11:02:36  + 4.1 min  subscriptions visible to Lab Tester: []
+11:03:06  + 4.6 min  subscriptions visible to Lab Tester: []
+11:03:37  + 5.1 min  subscriptions visible to Lab Tester: []
+11:04:07  + 5.6 min  subscriptions visible to Lab Tester: []
+resource groups Lab Tester can read: 0
+back to own profile: yes
+--- DIAGNOSIS: Lab Tester saw [] for 5.6 min; earlier commands hid errors with 2>$null ---
+H2 group members: labtester@<tenant>
+--- inherited view at explicit subscription scope ---
+Role    Scope
+------  -------------------------------------------------------
+Reader  /providers/Microsoft.Management/managementGroups/mg-lab
+--- H1 Lab Tester CLI session, errors shown ---
+ERROR: Please run 'az login' to setup account.
+WARNING: Please run "az login" to access your accounts.
+back to own profile: yes
+signed in as: labtester@<tenant>
+--- AFTER (re-test with a valid session) ---
+subscriptions visible to Lab Tester: [AZ104_PracticeSubscription]
+resource groups Lab Tester can read: 7
+back to own profile: yes

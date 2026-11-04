@@ -1,0 +1,100 @@
+=== Scenario 7 preflight (read-only), 2026-11-04 10:47 ===
+subscription: AZ104_PracticeSubscription
+--- management groups that exist now ---
+Name                                  Display
+------------------------------------  -----------------
+az104-mg1                             az104-mg1
+<guid>  Tenant Root Group
+--- where the subscription sits ---
+Sub                         Parent
+--------------------------  -------------------------------------------------------------------------------------
+AZ104_PracticeSubscription  /providers/Microsoft.Management/managementGroups/<guid>
+--- my roles at root scope '/' ---
+Role                       Scope
+-------------------------  -------
+User Access Administrator  /
+--- resource groups: location and costCenter tag (Deny impact check) ---
+Rg                        Location    CostCenter
+------------------------  ----------  ------------
+rg-hubspoke-lab           eastus
+NetworkWatcherRG          eastus
+rg-monitoring-lab         eastus      CC-1001
+rg-cicd-dev               eastus      CC-1001
+rg-cicd-prod              eastus      CC-1001
+rg-backup-lab             eastus      CC-1001
+DefaultResourceGroup-EUS  eastus
+--- existing policy assignments visible at subscription scope ---
+Assignment                                                        Scope                                                Mode
+----------------------------------------------------------------  ---------------------------------------------------  -------
+Block costly lab resources                                        /subscriptions/<guid>  Default
+ASC Default (subscription: <guid>)  /subscriptions/<guid>  Default
+--- P4 leftovers ---
+entra group: grp-lab-app-contributors
+ERROR: unrecognized arguments: --policy-type Custom
+
+https://aka.ms/cli_ref
+Read more about the command in reference docs
+--- built-in definitions for the initiative (confirming IDs) ---
+{
+  "defaultEffect": "Deny",
+  "id": "e56962a6-4747-49cd-b67b-bf8b01975c4c",
+  "mode": "Indexed",
+  "name": "Allowed locations"
+}
+{
+  "defaultEffect": "Deny",
+  "id": "e765b5de-1225-4ba3-bd56-1ac6695af988",
+  "mode": "All",
+  "name": "Allowed locations for resource groups"
+}
+{
+  "defaultEffect": null,
+  "id": "96670d01-0a4d-4649-9c89-2d3abc0a5025",
+  "mode": "All",
+  "name": "Require a tag on resource groups"
+}
+{
+  "defaultEffect": null,
+  "id": "ea3f2387-9b95-492a-a190-fcdc54f7b070",
+  "mode": "Indexed",
+  "name": "Inherit a tag from the resource group if missing"
+}
+--- az104-mg1 (pre-existing): children, policy assignments, role assignments ---
+{
+  "children": null,
+  "name": "az104-mg1",
+  "parent": "Tenant Root Group"
+}
+policy assignments at az104-mg1: 0
+Role                         PrincipalType    Scope
+---------------------------  ---------------  ----------------------------------------------------------
+Owner                        User             /providers/Microsoft.Management/managementGroups/az104-mg1
+Virtual Machine Contributor  Group            /providers/Microsoft.Management/managementGroups/az104-mg1
+--- custom policy definitions (fixed query: filter on policyType) ---
+
+--- assignments at Tenant Root Group (inherited by everything) ---
+policy assignments at root: 3
+--- detail: the 3 assignments returned for the root scope ---
+[
+  {
+    "assignment": "Microsoft Azure Multi Factor Authentication Enforcement for Resource Write Actions",
+    "definition": "/providers/Microsoft.Authorization/policyDefinitions/<guid>",
+    "mode": "Default",
+    "scope": "/providers/Microsoft.Management/managementGroups/<guid>"
+  },
+  {
+    "assignment": "Microsoft Azure Multi Factor Authentication Enforcement for Resource Delete Actions",
+    "definition": "/providers/Microsoft.Authorization/policyDefinitions/<guid>",
+    "mode": "Default",
+    "scope": "/providers/Microsoft.Management/managementGroups/<guid>"
+  },
+  {
+    "assignment": "Microsoft Azure region access restriction blocking West Europe region",
+    "definition": "/providers/Microsoft.Authorization/policyDefinitions/<guid>",
+    "mode": "Default",
+    "scope": "/providers/Microsoft.Management/managementGroups/<guid>"
+  }
+]
+NOTE: no custom policy definitions exist, although the P4 README says they were kept; P4 likely used built-ins under custom assignment names (to verify and correct in the README).
+NOTE: az104-mg1 pre-exists (empty; Owner user + Virtual Machine Contributor group assigned at MG scope). Not part of Scenario 7; left untouched.
+FINDING: the 3 root assignments are Microsoft-managed: mandatory MFA Phase 2 (Resource Write / Delete actions; Microsoft deploys these during system enforcement per Learn 'Mandatory MFA for Azure') and a West Europe region restriction. No conflict with Scenario 7 (eastus only; Jeff's writes already use MFA; labtester test is read-only).
