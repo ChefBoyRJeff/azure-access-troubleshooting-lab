@@ -235,3 +235,32 @@ Authentication succeeded; Conditional Access then blocked it, so it's a policy d
 
 ### Honest boundaries for this scenario
 This was built on a trial tenant with test users, not an HR-provisioned directory, so "HR data" was edited by hand. The *"I accepted but can't see anything"* guest ticket wasn't reproduced. Whether denied writes ever reach the Activity Log is an unconfirmed finding: none appeared within about 20 minutes. The portal's permission banner for administrative units was resolved by licensing the admins, but I didn't separately test which account's license the portal was checking.
+
+## 14. Scenario 9: Key Vault With a Managed Identity
+
+**30-second version:** "A VM reads its database password from Key Vault using a system-assigned managed identity, so there's no credential on the VM. I built it to fail layer by layer. From a private subnet the call timed out, which a service endpoint plus the vault firewall fixed. Then a 403 'Caller is not authorized', fixed with Key Vault Secrets User scoped to that one secret. I also showed 401s for a missing token, a wrong-audience token and a tampered token, and the vault firewall blocking me as Owner. I codified the network, vault and role in Bicep and checked it with what-if."
+
+**Numbers to quote (from the evidence):** IMDS token issued even from the private subnet; the vault call timed out (curl exit 28); 200 thirty seconds after the role assignment; list and write still 403 `ForbiddenByRbac`; a deleted secret recovered in 2 seconds with the same value; final what-if 1 modify (noise) and 2 no change; total cost under $0.05.
+
+### Practice questions
+
+**"An app on a VM can't read a Key Vault secret. How do you troubleshoot?"**
+Look at the failure type first. A timeout with no HTTP code is the network path. In my lab it was a private subnet with no route, fixed with a Key Vault service endpoint and a vault firewall rule for that subnet. A 401 is the token: missing, wrong audience or invalid. A 403 "Caller is not authorized" is RBAC: the identity needs a Key Vault data role. A 403 "Client address is not authorized" is the vault firewall. Then I check from the VM itself, through Run Command, not from my laptop, because my laptop is a different network and identity.
+
+**"What's the difference between a 401 and a 403?"**
+401 is authentication: the service can't trust who you are. I got it with no token (`AKV10000`), with a token issued for Azure Resource Manager instead of Key Vault (`AKV10022: Invalid audience`), and with a tampered token. 403 is authorization: it knows who you are and says no, either RBAC (`ForbiddenByRbac`) or the firewall.
+
+**"Why use a managed identity instead of a service principal secret?"**
+There's nothing to store, rotate or leak. The VM asks the local metadata endpoint for a token, and Azure handles the credential. It doesn't remove the need for authorization: the identity still needed a role, and I scoped it to one secret.
+
+**"Why can't an Owner read secrets?"**
+With the RBAC permission model, Owner is control plane only: it manages the vault, not its contents. Reading or writing secrets needs a data role like Key Vault Secrets Officer or Secrets User. A firewall can still block even then, as it did for me.
+
+**"Service endpoint or private endpoint?"**
+A service endpoint is free and needs no DNS changes; traffic goes over the Microsoft backbone and the vault firewall can allow the subnet, but the vault keeps its public IP. A private endpoint gives the vault a private IP in your VNet and lets you disable public access completely, at a small hourly cost and with private DNS to manage. I used a service endpoint here and a private endpoint for storage in another project.
+
+**"Someone deleted a secret. What happens?"**
+With soft delete, it's recoverable for the retention period, which I set to 7 days. The name is reserved meanwhile: creating a new secret with the same name returned Conflict. I recovered it, it came back with the original value in about 2 seconds, and the VM's secret-scoped role still worked without re-granting.
+
+### Honest boundaries for this scenario
+The VM was tested only through Run Command, not a real application. The VM and the secret value aren't in the Bicep, and the template was checked with what-if rather than deployed. The admin's laptop was allowed through the firewall with a /32 rule during the lab, which wouldn't be the production pattern.
